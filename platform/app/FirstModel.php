@@ -2,12 +2,13 @@
 namespace App;
 
 use IPHP\Model\Model;
+use IPHP\Model\HasOne;
 use IPHP\Database\Clause;
 use IPHP\Database\Where;
 use IPHP\Database\Having;
 
 class FirstModel extends Model {
-	protected $table = 'users';
+	protected $table = 'orders';
 	protected $primaryKeys = ['id'];
 
 	public function all () {
@@ -26,5 +27,9 @@ class FirstModel extends Model {
 					->orderBy('firstname');
 
 		return $this->get($join);
+	}
+
+	public function user () {
+		return new HasOne(new User, 'Users_id', 'id', 'user');
 	}
 }

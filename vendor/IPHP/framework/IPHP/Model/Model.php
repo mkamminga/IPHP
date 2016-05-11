@@ -15,9 +15,7 @@ class Model {
 	protected $ai = true;
 	protected $fields;
 	protected $onSave = 'insert';
-	protected $hasOne = [];
-	protected $hasMany = [];
-	protected $with = [];
+	protected $related = [];
 
 	public static function setDefaultConnection (DB $db) {
 		self::$defaultConnection = $db;
@@ -60,25 +58,34 @@ class Model {
 		return $this->getOne((new Selectable($this->table))->where($where));
 	}
 
-	public function get (Selectable $select) {
+	private function farceGet (Selectable $select) {
 		$queryResult = $this->connection->fetch($select->getComputedQuery(), $select->getValues());
-		if ($queryResult === false) {
+		if ($queryResult === false && !empty($this->connection->getErrors())) {
 			throw new \Exception("Query cause error: ". print_r($this->connection->getErrors(), true) . ' print '. $select->getComputedQuery());
 		}
-		//print($query);
-		return $this->fill($queryResult);
+
+		return $queryResult;
+	}
+
+	public function get (Selectable $select) {
+		$queryResult = $this->farceGet($select);
+
+		if ($queryResult){
+			return $this->fill($queryResult);
+		} else {
+			return NULL;
+		}
 	}
 
 	public function getOne (Selectable $select) {
-		$queryResult = $this->connection->fetch($select->getComputedQuery(), $select->getValues());
-		if ($queryResult === false) {
-			throw new \Exception("Query cause error: ". print_r($this->connection->getErrors(), true) . ' print '. $select->getComputedQuery());
-		}
-		$result = $this->fill($queryResult, true);
-
+		$queryResult = $this->farceGet($select);
 		
-
-		return (count($result) >= 1 ? $result[0] : []) ;
+		if ($queryResult){
+			$result = $this->fill($queryResult, true);
+			return (count($result) >= 1 ? $result[0] : []) ;
+		} else {
+			return NULL;
+		}
 	}
 
 	private function fill ($results, $single = false) {
@@ -104,6 +111,12 @@ class Model {
 		}
 
 		return $collection;
+	}
+
+	private function retriveRelated (array $collection = []) {
+		foreach ($this->with as $related) {
+			$related->injectIntoCollection($collection);
+		}
 	}
 
 	public function save () {
@@ -172,7 +185,7 @@ class Model {
 		$this->fields[$key] = $value;
 	}
 
-	public function retrive ($key) {
+	public function retreive ($key) {
 		return isset($this->fields->{$key}) ? $this->fields->{$key} : NULL;
 	}
 
@@ -186,55 +199,22 @@ class Model {
 
 			if (!method_exists($this, $method)) {
 				throw new \Exception("Method '". $method ."' does not exist");
+			} else {
+				$this->with[] = $this->{$method}();
 			}
 		}
 
 		return $this;
 	}
 
-	public function hasOne (Model $model, $foreignKey, $primaryKey) {
-		$this->hasOne[] = [
-			'model' => $model,
-			'foreignKey' => $foreignKey,
-			'primaryKey' => $primaryKey
-		];
-	}
-
-	public function hasMany () {
-
-	}
-
-	private function registerRelated () {
-		foreach ($this->with as $method) {
-			$this->{$method}();
-		}
-	}
-
-	private function retriveRelated (array &$collection = []) {
-		$this->registerRelated();
-	
-		$keys = [];
-		foreach ($this->hasOne as $related) {
-			$keys[$related['foreignKey']] = [];
-		}
-
-		foreach ($collection as $index => $model) {
-			foreach ($keys as $key => &$values) {
-				$value = $model->retrive($key);
-				$values[$value][] = $index;
-			}
-		}
-
-		$
-
-	}
-
-	protected function setOne () {
-		//
+	public function setRelated ($name, Model $modelRelated) {
+		var_dump($name);
+		$this->related[$name] = $modelRelated;
 	}
 
 	public function getRelated ($key) {
-		//return related 
+		var_dump($this->related);
+		return (array_key_exists($key, $this->related) ? $this->related[$key] : NULL);
 	}
 
 }

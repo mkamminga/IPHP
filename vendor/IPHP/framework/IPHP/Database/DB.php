@@ -47,14 +47,11 @@ class DB {
 			$lastError = end($this->lastError);
 			return $lastError;
 		}
-		return $this->pdo->errorInfo();
+		return null;
 	}
 
 	public function getAllErrors () {
-		$errors = $this->lastError;
-		array_push($errors, $this->pdo->errorInfo());
-
-		return $errors; 
+		return $this->lastError; 
 	}
 
 	public function delete (string $query, array $params = []) {

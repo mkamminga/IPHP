@@ -14,9 +14,7 @@ class HomeController {
 	}
 
 	public function showHome (Request $request, $id = 0, $title = "", FirstModel $model, OrderRows $or) {
-		var_dump($or->find(22,12)->delete());
-		$data = $model->find(9);
-
-		return new ViewResponse("compilethis.php", ["data" => $data->contents()]);
+		$data = $model->with('user')->find(1);
+		return new ViewResponse("compilethis.php", ["data" => [$data->contents(), $data->getRelated('user')]]);
 	}
 }

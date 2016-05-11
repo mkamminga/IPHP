@@ -1,0 +1,15 @@
+{
+    "name": "spakkionu/validate",
+    "description": "Validation Test",
+    "require": {
+        "illuminate/validation": "~4.2.9"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jonathan Bernardi",
+            "email": "jonathan@digitalcanvas.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}

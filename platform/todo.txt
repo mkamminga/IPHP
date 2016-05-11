@@ -1,0 +1,7 @@
+- models
+	- Database query builder (update, delete, join, group by) 
+	- Relationships
+- Breadcrumbs
+- view compiler (cache map)
+- 4extract constants
+

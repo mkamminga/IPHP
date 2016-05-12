@@ -14,6 +14,7 @@ class Model {
 	protected $primaryKeys = [];
 	protected $ai = true;
 	protected $fields;
+	protected $updatedFields = [];
 	protected $onSave = 'insert';
 	protected $related = [];
 
@@ -31,6 +32,8 @@ class Model {
 		} else {
 			$this->connection = $db;
 		}
+
+		$this->fields = new \stdClass;
 	}
 	/**
 	 * Require returns the queriable expression
@@ -58,8 +61,13 @@ class Model {
 		return $this->getOne((new Selectable($this->table))->where($where));
 	}
 
-	private function farceGet (Selectable $select) {
-		$queryResult = $this->connection->fetch($select->getComputedQuery(), $select->getValues());
+	private function farceGet (Selectable $select, $many = true) {
+		if ($many) {
+			$queryResult = $this->connection->fetchAll($select->getComputedQuery(), $select->getValues());	
+		} else {
+			$queryResult = $this->connection->fetch($select->getComputedQuery(), $select->getValues());
+		}
+		
 		if ($queryResult === false && !empty($this->connection->getErrors())) {
 			throw new \Exception("Query cause error: ". print_r($this->connection->getErrors(), true) . ' print '. $select->getComputedQuery());
 		}
@@ -78,7 +86,7 @@ class Model {
 	}
 
 	public function getOne (Selectable $select) {
-		$queryResult = $this->farceGet($select);
+		$queryResult = $this->farceGet($select, false);
 		
 		if ($queryResult){
 			$result = $this->fill($queryResult, true);
@@ -121,26 +129,51 @@ class Model {
 
 	public function save () {
 		$sql = NULL;
+		$executeabelSql = '';
 		$fields = (array)$this->fields;
+		$values = [];
+
 		if ($this->onSave == 'insert') {
-			$sql = new Insertable($this->table);
+			$sql 			= new Insertable($this->table);
+			$queriable 		= $sql->fields($fields);
+			$executeabelSql = $queriable->getComputedQuery();
+			$values 		= $queriable->getValues();
 		} else {
-
-			if ($this->ai && count($this->primaryKeys) == 1) {
-				if (array_key_exists($this->primaryKeys[0], $fields)) {
-					unset($fields[$this->primaryKeys[0]]);
-				}
+			//Nothing to update so lets save the trouble
+			if (empty($this->updatedFields)) {
+				return true;
 			}
-			$sql = new Updateable($this->table);			
+
+			$sql 			= new Updateable($this->table);
+			$keyValue 		= [];
+
+			foreach ($this->updatedFields as $key) {
+				$keyValue[$key] = $this->retreive($key);
+			}
+
+			$sql->fields($keyValue);
+
+			if (!empty($this->primaryKeys)) {
+				$where = new Where;
+				foreach ($this->primaryKeys as $key) {
+					$value = $this->retreive($key);
+					if ($value){
+						$where->equals($key, $this->retreive($key));
+					} else {
+						throw new \Exception("Primary key (". $key .") has no value!");
+					}
+				}
+
+				$sql->where($where);
+				$executeabelSql 	= $sql->getComputedQuery();
+				$values 			= $sql->getValues();
+			} else {
+				throw new \Exception("No primary keys set!");
+			}				
 		}
-		
-		$queriable = $sql->fields(array_keys($fields));
-		$sql = $queriable->getComputedQuery();
-		$values = array_values($fields);
 
-
-		if (!$this->connection->executeQuery($sql, $values, false)){
-			throw new \Exception("Could not save model due to an error: ". $this->connection->getErrors());
+		if (!$this->connection->executeQuery($executeabelSql, $values, false)){
+			throw new \Exception("Could not save model due to an error: ". print_r($this->connection->getErrors(), true) . ' '. $executeabelSql);
 		}
 
 		if ($this->onSave == 'insert' && $this->ai) {
@@ -160,11 +193,11 @@ class Model {
 		$where = new Where();
 
 		foreach ($this->primaryKeys as $key) {
-			$value = $this->retrive($key);
+			$value = $this->retreive($key);
 			if ($value === NULL) {
 				throw new \Exception("Value not set for primary key: '". $key . "'");
 			}
-			$where->equals($key, $this->retrive($key));
+			$where->equals($key, $this->retreive($key));
 		}
 
 		$delete->where($where);
@@ -182,7 +215,11 @@ class Model {
 	}
 
 	public function set ($key, $value) {
-		$this->fields[$key] = $value;
+		$this->fields->{$key} = $value;
+
+		if ($this->onSave == 'update' && !in_array($key, $this->updatedFields)) {
+			$this->updatedFields[] = $key;
+		}
 	}
 
 	public function retreive ($key) {
@@ -208,12 +245,14 @@ class Model {
 	}
 
 	public function setRelated ($name, Model $modelRelated) {
-		var_dump($name);
 		$this->related[$name] = $modelRelated;
 	}
 
+	public function setRelatedCollection ($name, array $collection = []) {
+		$this->related[$name] = $collection;
+	}
+
 	public function getRelated ($key) {
-		var_dump($this->related);
 		return (array_key_exists($key, $this->related) ? $this->related[$key] : NULL);
 	}
 

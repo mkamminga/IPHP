@@ -1,9 +1,11 @@
 <?php
 namespace IPHP\Database;
 
+use IPHP\Database\QueryTraits\ModifyQueriable;
+
 class Insertable extends Queriable {
-	protected $fields = [];
-	protected $values = [];
+	use ModifyQueriable;
+
 	protected $modus = 'INSERT';
 	protected $table;
 
@@ -11,23 +13,8 @@ class Insertable extends Queriable {
 		$this->table = $table;
 	}
 
-	public function fields (array $fields) {
-		foreach ($fields as $field) {
-			$this->fields[] = $field;
-		}
-
-		return $this;
-	}
-
-	public function values (array $values) {
-		$this->values = array_merge($this->values, $values);
-	}
-
-	public function addValue ($value) {
-		$this->values[] = $value;
-	}
-
 	public function modus (string $modus) {
+		$modus = strtoupper($modus);
 		if ($modus == 'INSERT' || $modus == 'REPLACE') {
 			$this->modus = $modus;
 		}
@@ -35,12 +22,10 @@ class Insertable extends Queriable {
 		return $this;
 	}
 
-	public function getValues () {
-		return $this->values;
-	}
-
 	public function getComputedQuery () {
-		$query =  $this->modus . ' INTO '. $this->table . ' ('. implode(',', $this->fields) .') VALUES(?'. str_repeat(',?', count($this->fields) - 1) .')';
+		$query =  $this->modus . ' INTO '. $this->table . ' ('. implode(',', array_keys($this->fields)) .') VALUES(?'. str_repeat(',?', count(array_keys($this->fields)) - 1) .')';
+
+		$this->values = array_values($this->fields);
 
 		return $query; 
 	}

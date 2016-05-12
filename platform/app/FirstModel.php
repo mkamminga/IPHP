@@ -12,11 +12,11 @@ class FirstModel extends Model {
 	protected $primaryKeys = ['id'];
 
 	public function all () {
-		$select = $this->select('username', 'address');
+		$select = $this->select();
 					//->where((new Where())->InSelect('username', $this->select('username')->where(new Where()->equals('id', 1))->is('address', '=', 'HAaa'))
 					//);
 
-		return $this->getOne($select);
+		return $select;
 	}
 
 	public function join () {

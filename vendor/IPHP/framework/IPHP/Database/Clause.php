@@ -76,7 +76,10 @@ class Clause extends Queriable {
 	}
 
 	public function clause (Clause $query, $andOr = 'AND') {
-		$this->append($andOr, '('. $query->getComputedQuery() . ')', $query->getValues());
+		$appendData = $query->getComputedQuery();
+		if ($appendData){
+			$this->append($andOr, '('. $query->getComputedQuery() . ')', $query->getValues());
+		}
 
 		return $this;
 	}

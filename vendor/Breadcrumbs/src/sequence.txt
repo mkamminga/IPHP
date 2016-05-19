@@ -1,0 +1,31 @@
+
+								Breadcrumbresolver					Breadcrumb						Router 	
+-- create(Router, array(Breadcrumb)) --> 
+										||
+-- bool resolve (RouteMatch)		-->
+										||
+											<- findBreadcrumb
+											[if != null]
+
+												[
+													while	----> getChild() 
+																		||
+													BreadCrumb <--------
+												]
+
+												----------------------------getMatch('routeName')--> 
+																									||
+												<---------------------------------------------------
+
+											[if !match]
+												------------------------------- resolveByName('name', [])
+																											---> [resolveByName]
+
+									------------------------------> setUrl(url)
+
+
+
+
+
+
+

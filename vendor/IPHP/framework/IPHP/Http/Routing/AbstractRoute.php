@@ -10,11 +10,11 @@ abstract class AbstractRoute {
 		$this->filters = $filters;
 	}
 
-	public function getUrl():string {
+	public function getUrl(): string {
 		return $this->url;
 	}
 
-	public function getFilters():array {
+	public function getFilters(): array {
 		return $this->filters;
 	}
 

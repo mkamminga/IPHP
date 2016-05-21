@@ -66,7 +66,8 @@ class Route extends AbstractRoute {
 	
 		if (preg_match('/^'. $pattern .'$/', $url, $results)) {
 			$this->registerFilters($router);
-			$this->routeMatch = new RouteMatch($url, $results, $this);
+			$this->registerRouteMatch($url, $results, $router);
+
 			return $this->routeMatch;
 		} else if (preg_match('/^'. $pattern . '/', $url, $results) && !empty($this->collection)) {
 			$this->registerFilters($router);
@@ -76,7 +77,7 @@ class Route extends AbstractRoute {
 				$match = $routeCollection->match($url, $namedGroups, $router);
 
 				if ($match) {
-					$this->routeMatch = new RouteMatch($url, $results, $this);
+					$this->registerRouteMatch($url, $results, $router);
 					$this->setChild($match->getRoute());
 
 					return $match;
@@ -85,5 +86,51 @@ class Route extends AbstractRoute {
 		}
 
 		return NULL;	
+	}
+
+	public function findMatchByName (string $name, Router $router) {
+		$router->registerRoute($this);
+		if ($name == $this->name) {
+			return $this;
+		}
+		
+
+		if (!empty($this->collection)) {
+			foreach ($this->collection as $routeCollection) {
+				$routeCollection->register($this);
+				$match = $routeCollection->findMatchByName($name, $router);
+
+				if ($match) {
+					return $match;
+				}
+			}
+		}
+
+		return NULL;
+	}
+
+	public function getUrlFromParams (array $params = [], array $namedGroups = []) {
+		$url = $this->url;
+		if (!empty($params)) {
+			$url = preg_replace('/\(\?\<(.*?)\>\[(.*?)\]\)/', '[$1]', $url);
+
+			foreach ($params as $key => $value) {
+				$url = str_replace('['. $key .']', $value, $url);
+			}
+		}
+
+		$pattern = $this->routePatternFromUrl($namedGroups);
+
+		
+		if (preg_match('/^'. $pattern .'$/', $url)) {
+			return $url;
+		} else {
+			throw new \Exception("Params do not match!");
+		}
+	} 	
+
+	private function registerRouteMatch (string $url, array $results = [], Router $router) {
+		$this->routeMatch = new RouteMatch($url, $results, $this);
+		$router->registerRoute($this);
 	}
 }

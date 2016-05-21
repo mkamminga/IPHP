@@ -5,8 +5,8 @@ use IPHP\Http\Routing\RouteCollection;
 return [
 	'settings' => [
 		'defaults' => [
-			'[id]' => '(?<id>[0-9]+)',
-			'[title]' => '(?<title>[A-z\_0-9\-]+)'
+			'[num]' => '[0-9]+',
+			'[alpha_num]' => '[A-z\_0-9\-]+'
 		],
 		'exceptions' => [
 			404 => App\Controllers\HomeController::class,
@@ -14,10 +14,10 @@ return [
 		]
 	],
 	'routes' => [
-		new Route('Home', 'home', 'get', App\Controllers\HomeController::class, 'showHome'),
-		new RouteCollection('/subdir/[id]/[title]/', [App\Filters\UserLoggedinFilter::class => ["group" => "user"]], [
-			(new Route('Home', '/home', 'get', App\Controllers\HomeController::class, 'showHome'))->addCollection([
-				new Route('Home', '/home', 'get', App\Controllers\HomeController::class, 'showHome')
+		new Route('HomeA', 'home', 'get', App\Controllers\HomeController::class, 'showHome'),
+		new RouteCollection('/subdir/[num:id]/[alpha_num:title]/', [App\Filters\UserLoggedinFilter::class => ["group" => "user"]], [
+			(new Route('HomeB', '/home', 'get', App\Controllers\HomeController::class, 'showHome'))->addCollection([
+				new Route('HomeC', '/home', 'get', App\Controllers\HomeController::class, 'showHome')
 			])
 		])
 	]

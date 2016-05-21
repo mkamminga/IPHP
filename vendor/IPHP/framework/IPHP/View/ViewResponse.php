@@ -23,6 +23,10 @@ class ViewResponse {
 		return $this->vars;
 	}
 
+	public function setVar ($key, $value) {
+		$this->vars[$key] = $value;
+	}
+
 	public function getInjectedVar ($name) {
 		return (array_key_exists($name, $this->vars) ? $this->vars[$name] : NULL);
 	}

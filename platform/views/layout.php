@@ -6,8 +6,23 @@
 </head>
 <body>
 <div id="main">
+	>> section('breadcrumbs')
+	>> uses breadcrumbs
+		<div class="breadcrumbs">
+		<?php
+		if (isset($breadcrumbs) && is_array($breadcrumbs)) {
+			foreach ($breadcrumbs as $breadcrumb) {
+				print(' <a href="'. $breadcrumb->getUrl() .'">'. $breadcrumb->getTitle() . '</a> ');
+			}
+		}
+		?>
+		</div>
+	<< section('breadcrumbs')
+
+	<< show('breadcrumbs', '')
+
 	>> section('content')
-	<h1>Master lqyout</h1>
+		<h1>Master lqyout</h1>
 	<< section('content')
 	<< show('content', 'de')
 

@@ -51,7 +51,6 @@ class App extends ServiceManager{
 		if ($this->hasConfig('providers')) {
 			$this->services = $this->getConfig('providers');
 		}
-
 		
 		$this->registerInstanceAlias('eventManager', EventManager::class, new EventManager($this));
 		$this->registerInstanceAlias('reflectorService', ReflectorService::class, new ReflectorService($this));

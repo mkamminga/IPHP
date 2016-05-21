@@ -27,4 +27,18 @@ class RouteCollection extends AbstractRoute {
 
 		return NULL;	
 	}
+
+	public function findMatchByName (string $name, Router $router) {
+		if (!empty($this->subRoutes)) {
+			foreach ($this->subRoutes as $route) {
+				$route->register($this);
+				$match = $route->findMatchByName($name, $router);
+				if ($match) {
+					return $match;
+				}
+			}
+		}
+
+		return NULL;
+	}
 }

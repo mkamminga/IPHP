@@ -8,6 +8,12 @@ class Router {
 	private $defaultNamedGroups = [];
 	private $filters = [];
 	private $request;
+	private $routeMatch;
+	private $registeredNamedRoutes = [];
+	/**
+	 * [__construct description]
+	 * @param array $routingConfig [description]
+	 */
 	public function __construct (array $routingConfig) {
 		$this->request = new Request;
 		//throw exception if config is invalid
@@ -16,7 +22,11 @@ class Router {
 			$this->registerdRoutes = $routingConfig['routes'];
 		}
 	}
-
+	/**
+	 * [isValidConfig description]
+	 * @param  array   $config [description]
+	 * @return boolean         [description]
+	 */
 	private function isValidConfig(array $config){
 		$validateAgainst = [
 			'settings' => [
@@ -56,9 +66,20 @@ class Router {
 
 		return true;
 	}
-
+	/**
+	 * [settingsFromConfig description]
+	 * @param  array  $settings [description]
+	 * @return [type]           [description]
+	 */
 	private function settingsFromConfig (array $settings) {
 		$this->defaultNamedGroups = $settings['defaults'];
+	}
+	/**
+	 * [getNamedGroups description]
+	 * @return [type] [description]
+	 */
+	public function getNamedGroups () {
+		return $this->defaultNamedGroups;
 	}
 	/**
 	 * attempts to 
@@ -72,6 +93,8 @@ class Router {
 				$match = $routeable->match($url, $this->defaultNamedGroups, $this);
 
 				if ($match) {
+					$this->routeMatch = $match;
+
 					return $match;
 				}
 			}
@@ -80,12 +103,47 @@ class Router {
 		return NULL;
 	}
 	/**
+	 * [getRouteMatch description]
+	 * @return [type] [description]
+	 */
+	public function getRouteMatch () {
+		return $this->routeMatch;
+	}
+	/**
+	 * 
+	 * @param  string $name  [description]
+	 * @param  Route  $route [description]
+	 * @return [type]        [description]
+	 */
+	public function registerRoute (Route $route) {
+		$this->registeredNamedRoutes[$route->getName()] = $route;
+	}
+	/**
 	 * @todo 
 	 * @param  [type] $name [description]
 	 * @return [type]       [description]
 	 */
-	public function findMatchByName ($name) {
-		//
+	public function urlByRouteName ($name, array $params = []): string {
+		$match = NULL;
+		if (array_key_exists($name, $this->registeredNamedRoutes)) {
+			$match =  $this->registeredNamedRoutes[$name];
+		} else {
+			foreach ($this->registerdRoutes as $routeable) {
+				if ($routeable instanceof AbstractRoute) {
+					$match = $routeable->findMatchByName($name, $this);
+
+					if ($match) {
+						break;
+					}
+				}
+			}
+		}
+
+		if ($match !== NULL && $match instanceof Route) {
+			return $match->getUrlFromParams($params, $this->defaultNamedGroups);
+		} else {
+			throw new \Exception("Route not registerd!");
+		}
 	}
 	/**
 	 * Register middleware filters to be applied before every request
@@ -95,11 +153,17 @@ class Router {
 	public function registerFilter ($filter, array $params = []) {
 		$this->filters[] = [$filter => $params];
 	}
-
+	/**
+	 * [getFilters description]
+	 * @return [type] [description]
+	 */
 	public function getFilters ():array {
 		return $this->filters;
 	}
-
+	/**
+	 * [getRequest description]
+	 * @return [type] [description]
+	 */
 	public function getRequest (): Request {
 		return $this->request;
 	}

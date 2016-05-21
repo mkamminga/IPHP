@@ -16,11 +16,11 @@ class HomeController {
 	}
 
 	public function showHome (Request $request, $id = 0, $title = "", FirstModel $model) {
-		$this->testCategorySave();
+		/*$this->testCategorySave();
 		$this->testCategoryUpdate();
-		$this->testDelete();
-
-		$data = $model->with('user')->get($model->all());
+		$this->testDelete();*/
+		$data = [];
+		//$data = $model->with('user')->get($model->all());
 		return new ViewResponse("compilethis.php", ["data" => [$data]]);
 	}
 

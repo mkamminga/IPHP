@@ -6,7 +6,7 @@ abstract class AbstractRoute {
 	protected $filters = [];
 
 	public function __construct ($url, array $filters = []) {
-		$this->url = $url;
+		$this->url = preg_replace('/\[([a-z0-9_]+)(\:)([a-z0-9_]+)\]/', '(?<$3>[$1])', $url);
 		$this->filters = $filters;
 	}
 
@@ -41,6 +41,7 @@ abstract class AbstractRoute {
 
 	protected function routePatternFromUrl (array $namedGroups = []) {
 		$pattern = str_replace(array_keys($namedGroups), array_values($namedGroups), $this->url);
+		
 		if (strlen($pattern) > 0 && $pattern[0] != '/') {
 			$pattern = '/' . $pattern;
 		}
@@ -60,4 +61,5 @@ abstract class AbstractRoute {
 		}
 	}
 
+	abstract public function findMatchByName (string $name, Router $router);
 }

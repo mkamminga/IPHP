@@ -6,9 +6,19 @@
 </head>
 <body>
 <div id="main">
-		<?php $data=$__view->getInjectedVar("data"); ?>
+		<?php $breadcrumbs=$__view->getInjectedVar("breadcrumbs"); ?>
+			<div class="breadcrumbs">
+		<?php
+		if (isset($breadcrumbs) && is_array($breadcrumbs)) {
+			foreach ($breadcrumbs as $breadcrumb) {
+				print(' <a href="'. $breadcrumb->getUrl() .'">'. $breadcrumb->getTitle() . '</a> ');
+			}
+		}
+		?>
+		</div>
+			<?php $data=$__view->getInjectedVar("data"); ?>
 		
-	<h1>Master lqyout</h1>
+		<h1>Master lqyout</h1>
 	<div class="content">
 	<p>Content</p>
 	<?php

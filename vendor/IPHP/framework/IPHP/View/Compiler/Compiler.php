@@ -91,6 +91,7 @@ class Compiler {
 
 		foreach ($sections as $section) {
 			$uses = $section->getUses();
+
 			if (count($uses) > 0) {
 				$content = $section->getContent();
 
@@ -109,6 +110,10 @@ class Compiler {
 				
 				$section->setContent($content);
 			}
+		}
+
+		if ($view->getParent() != NULL){
+			$this->injectVarsIntoSections($view->getParent());
 		}
 	}
 

@@ -12,11 +12,11 @@ class Show {
 		$this->defaultContent = $defaultContent;
 	}
 
-	public function getName () {
+	public function getName (): string {
 		return $this->name;
 	}
 
-	public function getOutput () {
+	public function getOutput (): string {
 		if ($this->section) {
 			return $this->section->getOutput();
 		} else {

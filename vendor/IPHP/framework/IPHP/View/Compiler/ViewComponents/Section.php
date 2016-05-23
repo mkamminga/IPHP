@@ -1,7 +1,9 @@
 <?php
 namespace IPHP\View\Compiler\ViewComponents;
 
-class Section {
+use IPHP\View\Compiler\AbstractShowParser;
+
+class Section extends AbstractShowParser {
 	protected $name = '';
 	protected $content = '';
 	protected $uses = [];
@@ -39,8 +41,18 @@ class Section {
 		$this->parent = $parent;
 	}
 
+	public function addShow (Show $show) {
+		$this->shows[] = $show;
+	}
+
+	public function getShows ():array {
+		return $this->shows;
+	}
+
 	public function getOutput() {
-		return preg_replace('/[\n\r]*\[parent\][\n\r]*/', ($this->parent ? $this->parent->getOutput() : ''), $this->content);
+		$output =  preg_replace('/[\n\r]*\[parent\][\n\r]*/', ($this->parent ? $this->parent->getOutput() : ''), $this->content);
+
+		return $this->parseShows($output);
 	}
 
 	protected function parse () {
@@ -53,7 +65,11 @@ class Section {
 
 		$this->content = preg_replace_callback('/[\n\r]*>>\s+uses\s([a-z0-9_]+)[\n\r]*/', function ($matches) {
 			$this->uses[] = $matches[1];
+
 			return '';
 		}, $this->content);
+
+
+		$this->content = $this->extractShows($this->content);
 	}
 }

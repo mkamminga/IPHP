@@ -11,6 +11,9 @@ class Request {
 		//setup the vars correctly
 		$this->baseUrl = dirname($_SERVER['SCRIPT_NAME']);
 		$this->currentUrl = str_replace($this->baseUrl, '', urldecode($_SERVER['REQUEST_URI']));
+		if (strlen($this->currentUrl) > 0 && $this->currentUrl[0] != "/"){
+			$this->currentUrl = '/' . $this->currentUrl;
+		}
 	}
 	/**
 	 * [getMethod description]

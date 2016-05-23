@@ -35,7 +35,7 @@ class Compiler {
 	public function getCompiledname (ViewResponse $viewResponse) {
 		$path = $viewResponse->getViewPath();
 
-		return basename($path);
+		return str_replace(DIRECTORY_SEPARATOR, '.', $path);
 	}
 
 	public function compile (ViewResponse $viewResponse) {
@@ -48,7 +48,7 @@ class Compiler {
 		$name 	= $this->getCompiledname($viewResponse);
 		
 		return file_put_contents($this->cachemapPath . $name, $this->saveCacheMap($currentView)) &&
-			   file_put_contents($this->compiledPath . $name, $output);
+			   file_put_contents($this->compiledPath . $name, '<?php use IPHP\View\Helpers\VH;?>' . $output);
 
 	}
 
@@ -95,7 +95,6 @@ class Compiler {
 		while ($currentView != null) {
 			$shows = $currentView->getShows();
 			
-
 			if (!empty($shows)) {
 				foreach ($shows as $show) {
 					$section = $this->resolveSection($show->getName(), $currentView);
@@ -115,6 +114,7 @@ class Compiler {
 		$currentView = $masterView;
 		$currentSection = null;
 		while($currentView != null) {
+
 			if ($currentView->hasSection($sectionName)) {
 				
 				$section = $currentView->getSection($sectionName);

@@ -5,6 +5,7 @@ use IPHP\App\Kernel\Kernel;
 use IPHP\Events\EventManager;
 use IPHP\Database\ConnectionManager;
 use IPHP\Model\Model;
+use IPHP\Translation\Translator;
 
 class App extends ServiceManager{
 	private $configs = [];
@@ -57,8 +58,17 @@ class App extends ServiceManager{
 		
 		if ($this->hasConfig('app')){
 			$app = $this->getConfig('app');
-			if ($app->hasKey('database', $app)){
+			//register db connection manager
+			if ($app->hasKey('database')){
 				$this->registerInstanceAlias('connectionManager', ConnectionManager::class, new ConnectionManager($app->getValue('database')));
+			}
+			//register translator
+			if ($app->hasKey('lang')){
+				$langValues = $app->getValue('lang');
+				$langFiles 	= include $langValues['path'] . DIRECTORY_SEPARATOR . $langValues['name'] . '.php';
+				$translator = new Translator($langValues['name'], $langFiles);
+
+				$this->registerInstanceAlias('translator', Translator::class, $translator);
 			}
 		}
 	}

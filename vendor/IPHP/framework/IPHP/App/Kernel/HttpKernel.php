@@ -86,7 +86,7 @@ class HttpKernel extends Kernel {
 	public function finnish (ViewResponse $viewResponse) {
 		if ($this->app->hasConfig('app')){
 			$viewsPaths = $this->app->getConfig('app')->getValue('views');
-			$view = new View($viewResponse, $viewsPaths);
+			$view = new View($viewResponse, $viewsPaths, $this->app->getService('reflectorService'));
 			$view->render();
 			$this->app->getService('eventManager')->publish('finnish');
 			

@@ -1,18 +1,22 @@
 <?php
 namespace IPHP\View;
 
+use IPHP\App\ReflectorService;
 use IPHP\Http\Response;
 use IPHP\View\Compiler\Compiler;
+use IPHP\View\Helpers\VH;
 
 class View {
 	private $viewResponse;
 	private $compiler;
 	private $paths = [];
 
-	public function __construct (ViewResponse $viewResponse, array $paths = []) {
+	public function __construct (ViewResponse $viewResponse, array $paths = [], ReflectorService $reflectorService) {
 		$this->paths = $paths;
 		$this->viewResponse = $viewResponse;
 		$this->compiler = new Compiler($paths['path'], $paths['compiled_path'], $paths['cache_map']);
+
+		VH::register($reflectorService);
 	}	
 
 	public function getCompiledOutput() {
@@ -58,7 +62,8 @@ function showView (ViewResponse $view, $compiledFile) {
 		return $data;
 	} catch (\Exception $e) {
 		ob_end_clean();
-		throw new \Exception("View rendering exception: ". $e->getMessage());
+		var_dump($e);
+		throw new \Exception("View rendering exception: ". $e->getMessage() );
 		
 	}
 }

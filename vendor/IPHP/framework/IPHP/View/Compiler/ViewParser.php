@@ -4,12 +4,11 @@ use IPHP\View\Compiler\ViewComponents\Section;
 use IPHP\View\Compiler\ViewComponents\SingleLineSection;
 use IPHP\View\Compiler\ViewComponents\Show;
 
-class ViewParser {
+class ViewParser extends AbstractShowParser {
 	private $fileName;
 	private $parentView = NULL;
 	private $childView = NULL;
 	private $sections = [];
-	private $shows = [];
 	private $output = NULL;
 	private $basePath;
 
@@ -68,17 +67,18 @@ class ViewParser {
 		return array_key_exists($name, $this->sections) ? $this->sections[$name] : NULL;
 	}
 
-	private function extractShows ($data) {
-		return preg_replace_callback('/[\n\r]*<<\s+show\(\'([a-z]+)\'\,\s*\'([a-zA-Z\s]*)\'\)[\n\r]*/', function ($matches) {
-
-			$this->shows[$matches[1]] = new Show($matches[1], $matches[2]);
-
-			return '[show='. $matches[1] .']';
-		}, $data);	
-	}
-
 	public function getShows () {
-		return $this->shows;
+		$shows =  $this->shows;
+
+		foreach ($this->sections as $section) {
+			$sectionShows = $section->getShows();
+
+			foreach ($sectionShows as $show) {
+				$shows[] = $show;
+			}
+		}
+
+		return $shows;
 	}
 
 	public function getSections () {
@@ -86,12 +86,7 @@ class ViewParser {
 	}
 
 	public function getOutput () {
-		$output = $this->output;
-		foreach ($this->shows as $show) {
-			$output = preg_replace('/[\n\r]*\[show\='. $show->getName() .'\][\n\r]*/', $show->getOutput(), $output);
-		}
-		
-		return $output;
+		return $this->parseShows($this->output);
 	}
 
 	public function parse() {
@@ -101,7 +96,7 @@ class ViewParser {
 		
 			$data = $this->extractParent($data);
 			$data = $this->extractSections($data);
-			$data = $this->extractShows($data);	
+			$data = $this->extractShows($data);
 
 			$this->output = $data;
 		}

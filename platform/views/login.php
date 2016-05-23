@@ -1,8 +1,8 @@
->> parent('layout::layout.php')
+>> parent('layout::frontend.php')
 
 >> section('title', 'login')
->> section('content')
-	>> parent
+>> section('fcontent')
+
 <div class="row">
     <div class="large-12 columns">
 
@@ -21,6 +21,7 @@
     endif;
     ?>
         <h1>Login</h1>
+        <a href="<?php print(VH::service('url')->route('LoginBase')); ?>">URL</a>
         <form method="POST" action="">
             <div class="large-3 rows">
                 Username
@@ -44,4 +45,4 @@
         <a class="small button secondary" href="/register">New user? Register here!</a>
     </div>
 </div>  
-<< section('content')
+<< section('fcontent')

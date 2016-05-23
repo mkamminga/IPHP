@@ -7,11 +7,13 @@ use IPHP\Http\Routing\RouteMatch;
 class BreadcrumbResolver {
 	private $router;
 	private $breadcrumbs;
+	private $urlPrefix;
 	private $compiled = [];
 
-	public function __construct (Router $router, array $breadcrumbs = []) {
+	public function __construct (Router $router, array $breadcrumbs = [], string $urlPrefix = '') {
 		$this->router = $router;
 		$this->breadcrumbs = $breadcrumbs;
+		$this->urlPrefix = $urlPrefix;
 	}
 
 	public function findByName ($routeName) {
@@ -52,7 +54,7 @@ class BreadcrumbResolver {
 						}
 					}
 
-					$breadcrumb->setUrl($this->router->urlByRouteName($breadcrumb->getName(), $params));
+					$breadcrumb->setUrl($this->urlPrefix . $this->router->urlByRouteName($breadcrumb->getName(), $params));
 					$breadcrumb->resolve($params);
 
 					array_unshift($this->compiled, $breadcrumb);

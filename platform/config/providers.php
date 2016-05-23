@@ -3,5 +3,5 @@
  * Providers
  */
 return [
-	IPHP\Database\ConnectionManager::class
+	\IPHP\Session\SessionManager::class
 ];

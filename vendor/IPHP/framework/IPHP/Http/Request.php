@@ -27,6 +27,13 @@ class Request {
 		return $this->currentUrl;
 	}
 	/**
+	 * [baseUrl description]
+	 * @return [type] [description]
+	 */
+	public function baseUrl () {
+		return $this->baseUrl;
+	}
+	/**
 	 * The full url of the request
 	 * 
 	 * @return [type] [description]
@@ -39,7 +46,29 @@ class Request {
 	 * @return [type] [description]
 	 */
 	public function get ($name) {
-		//
+		if ($this->fromPost($name) != NULL) {
+			return $this->fromPost($name);
+		} else if ($this->fromGet($name) != NULL) {
+			return $this->fromGet($name);
+		}
+
+		return NULL;
+	}
+	/**
+	 * [fromPost description]
+	 * @param  [type] $name [description]
+	 * @return [type]       [description]
+	 */
+	public function fromPost ($name) {
+		return isset($_POST[$name]) ? $_POST[$name] : NULL;
+	}
+	/**
+	 * [fromGet description]
+	 * @param  [type] $name [description]
+	 * @return [type]       [description]
+	 */
+	public function fromGet ($name) {
+		return isset($_GET[$name]) ? $_GET[$name] : NULL;
 	}
 	/**
 	 * returns merged post, get, files
@@ -52,5 +81,19 @@ class Request {
 		}
 
 		return $this->all;
+	}
+	/**
+	 * [agent description]
+	 * @return [type] [description]
+	 */
+	public function agent () {
+		return $_SERVER['HTTP_USER_AGENT'];
+	}
+	/**
+	 * [ip description]
+	 * @return [type] [description]
+	 */
+	public function ip () {
+		return $_SERVER['REMOTE_ADDR'];
 	}
 }

@@ -25,8 +25,6 @@ function extractConstansts (array $constants) {
 
 extractConstansts (include $configPath . 'constants.php');
 
-var_dump(public_path);
-
 $httpKernel = new IPHP\App\Kernel\HttpKernel($app);
 //And of we go
 $app->resolve($httpKernel);

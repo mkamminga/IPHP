@@ -34,5 +34,4 @@ class ViewResponse {
 	public function getHttpResponse () {
 		return $this->httpResponse;
 	}
-
 }

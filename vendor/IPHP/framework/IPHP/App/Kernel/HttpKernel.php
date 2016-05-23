@@ -25,6 +25,9 @@ class HttpKernel extends Kernel {
 
 			$app->registerInstanceAlias('router', Router::class, $this->router);
 			$app->registerInstanceAlias('request', Request::class, $this->router->getRequest());
+
+			$this->app->getService('eventManager')->publish('kernel.booted');
+
 		} else {
 			throw new \Exception("Missing config file: Routes");
 		}

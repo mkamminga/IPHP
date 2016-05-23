@@ -31,20 +31,7 @@ class View {
 	}
 
 	private function captureViewOutput ($compiledFile) {
-		try {
-			ob_start();
-			$__view = $this->viewResponse;
-			require $compiledFile;
-
-			$data = ob_get_contents();
-			ob_end_clean();
-		} catch (\Exception $e) {
-			ob_end_clean();
-			throw new \Exception("View rendering exception: ". $e->getMessage());
-			
-		}
-
-		return $data;
+		return showView($this->viewResponse, $compiledFile);
 	}
 
 	public function render () {
@@ -52,4 +39,27 @@ class View {
 		$httpResponse->setBody($this->getCompiledOutput());
 		$httpResponse->send();
 	}
+}
+/**
+ * extract data and prevent the calling of this
+ * @param  ViewResponse $view         [description]
+ * @param  [type]       $compiledFile [description]
+ * @return [type]                     [description]
+ */
+function showView (ViewResponse $view, $compiledFile) {
+	try {
+		ob_start();
+		$__view = $view;
+		require $compiledFile;
+
+		$data = ob_get_contents();
+		ob_end_clean();
+
+		return $data;
+	} catch (\Exception $e) {
+		ob_end_clean();
+		throw new \Exception("View rendering exception: ". $e->getMessage());
+		
+	}
+
 }

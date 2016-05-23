@@ -121,7 +121,6 @@ class Route extends AbstractRoute {
 
 		$pattern = $this->routePatternFromUrl($namedGroups);
 
-		
 		if (preg_match('/^'. $pattern .'$/', $url)) {
 			return $url;
 		} else {

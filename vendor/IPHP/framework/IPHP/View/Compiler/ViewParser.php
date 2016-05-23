@@ -16,12 +16,20 @@ class ViewParser {
 	public function __construct($baseViewPath, $fileName, ViewParser $childView = null){
 		$this->basePath = $baseViewPath;
 		$this->fileName = $fileName;
+
+		if (!file_exists($baseViewPath . $fileName)) {
+			throw new \Exception("Couldn't find file: ". $fileName, 1);
+		}
 		$this->childView = $childView;
 	}
 
+	public function getPath () {
+		return $this->basePath . $this->fileName;
+	}
+
 	private function extractParent ($data) {
-		return preg_replace_callback('/[\n\r]*>>\s+parent\(\'([a-z\.]+)\'\)[\n\r]*/', function ($matches) {
-			$this->parentView = new ViewParser($this->basePath, $matches[1], $this);
+		return preg_replace_callback('/[\n\r]*>>\s+parent\(\'([a-z\.\:\:]+)\'\)[\n\r]*/', function ($matches) {
+			$this->parentView = new ViewParser($this->basePath, str_replace("::", DIRECTORY_SEPARATOR, $matches[1]), $this);
 
 			return '[parent]';
 		}, $data);

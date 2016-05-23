@@ -9,8 +9,7 @@ return [
 			'[alpha_num]' => '[A-z\_0-9\-]+'
 		],
 		'exceptions' => [
-			404 => App\Controllers\HomeController::class,
-			403 => App\Controllers\HomeController::class 
+			404 => new Route('Route404', '', 'all', App\Controllers\Exceptions\FourOFourException::class, 'show')
 		]
 	],
 	'routes' => [

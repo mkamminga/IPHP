@@ -9,7 +9,7 @@ class RouteCollection extends AbstractRoute {
 		$this->subRoutes = $subRoutes;
 	}
 
-	public function match ($url, array $namedGroups = [], Router $router) {
+	public function match ($url, array $namedGroups = [], Router $router, $method = 'get') {
 		$pattern = $this->routePatternFromUrl($namedGroups);
 
 		if (preg_match('/^'. $pattern .'/', $url)) {
@@ -17,7 +17,7 @@ class RouteCollection extends AbstractRoute {
 
 			foreach ($this->subRoutes as $route) {
 				$route->register($this);
-				$match = $route->match($url, $namedGroups, $router);
+				$match = $route->match($url, $namedGroups, $router, $method);
 				if ($match) {
 					return $match;
 				}

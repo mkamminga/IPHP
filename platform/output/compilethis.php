@@ -1,22 +1,22 @@
 <!doctype html>
 <html>
 <head>
-	<title><?php $title=$__view->getInjectedVar("title"); ?><?php print($title); ?></title>	
+	<title><?php if (!isset($title) || $title != $__view->getInjectedVar("title")){$title=$__view->getInjectedVar("title");} ?><?php print($title); ?></title>	
 	<meta charset="UTF-8">
 </head>
 <body>
 <div id="main">
-		<?php $breadcrumbs=$__view->getInjectedVar("breadcrumbs"); ?>
+		<?php if (!isset($breadcrumbs) || $breadcrumbs != $__view->getInjectedVar("breadcrumbs")){$breadcrumbs=$__view->getInjectedVar("breadcrumbs");} ?>
 			<div class="breadcrumbs">
 		<?php
 		if (isset($breadcrumbs) && is_array($breadcrumbs)) {
 			foreach ($breadcrumbs as $breadcrumb) {
-				print(' <a href="'. $breadcrumb->getUrl() .'">'. $breadcrumb->getTitle() . '</a> ');
+				print(' <a href="'. $breadcrumb->getUrl() .'" class="breadcrumb">'. $breadcrumb->getTitle() . '</a> ');
 			}
 		}
 		?>
 		</div>
-			<?php $data=$__view->getInjectedVar("data"); ?>
+			<?php if (!isset($data) || $data != $__view->getInjectedVar("data")){$data=$__view->getInjectedVar("data");} ?>
 		
 		<h1>Master lqyout</h1>
 	<div class="content">

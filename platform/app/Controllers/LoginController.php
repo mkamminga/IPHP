@@ -2,6 +2,7 @@
 namespace App\Controllers;
 use IPHP\App\ServiceManager;
 use IPHP\Http\Request;
+use IPHP\View\ViewResponse;
 use App\Guards\UserGuard;
 use App\Guards\UserSessionGuard;
 use App\User;
@@ -17,17 +18,20 @@ class LoginController {
 		$this->userSessionGuard = $userSessionGuard;
 	}
 
-	public function showLogin (User $user) {
+	public function showLogin () {
+		return new ViewResponse("login.php");
+	}
+
+	public function loginPost (Request $request, User $user) {
 		if (!$this->userGuard->loggedIn()){
 			$user = $user->find(1);
 
 			if (password_verify('test', $user->retreive('password'))) {
 				$testPass = password_hash("test", PASSWORD_BCRYPT, ['cost' => 12]);
-
+				//update salt
 				$user->set('password', $testPass);
-
-				var_dump($user->save());
-
+				$user->save();
+				//set loggedin
 				$this->userSessionGuard->setLoggedIn($user->retreive('id'));
 				$this->userGuard->setUser($user);
 			} else {
@@ -35,6 +39,4 @@ class LoginController {
 			}
 		}
 	}
-
-	public function loginPost (Request $request, User $user) {}
 }

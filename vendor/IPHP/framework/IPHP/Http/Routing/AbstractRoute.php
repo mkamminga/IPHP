@@ -18,7 +18,7 @@ abstract class AbstractRoute {
 		return $this->filters;
 	}
 
-	abstract public function match($url, array $groups = [], Router $router);
+	abstract public function match($url, array $groups = [], Router $router, $method = 'get');
 	
 	public function register(AbstractRoute $registerable){
 		$parentRoute = $registerable->getUrl();

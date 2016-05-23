@@ -59,12 +59,13 @@ class Route extends AbstractRoute {
 		return $this->parentRoute;
 	}
 
-	public function match ($url, array $namedGroups = [], Router $router) {
+	public function match ($url, array $namedGroups = [], Router $router, $method = 'get') {
 		$results = [];
 		
 		$pattern = $this->routePatternFromUrl($namedGroups);
 	
-		if (preg_match('/^'. $pattern .'$/', $url, $results)) {
+		if (($method == 'all' || $this->callableByMethod == $method) 
+			&& preg_match('/^'. $pattern .'$/', $url, $results)) {
 			$this->registerFilters($router);
 			$this->registerRouteMatch($url, $results, $router);
 
@@ -74,7 +75,7 @@ class Route extends AbstractRoute {
 
 			foreach ($this->collection as $routeCollection) {
 				$routeCollection->register($this);
-				$match = $routeCollection->match($url, $namedGroups, $router);
+				$match = $routeCollection->match($url, $namedGroups, $router, $method);
 
 				if ($match) {
 					$this->registerRouteMatch($url, $results, $router);

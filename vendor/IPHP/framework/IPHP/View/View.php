@@ -12,7 +12,7 @@ class View {
 	public function __construct (ViewResponse $viewResponse, array $paths = []) {
 		$this->paths = $paths;
 		$this->viewResponse = $viewResponse;
-		$this->compiler = new Compiler($paths['path'], $paths['compiled_path']);
+		$this->compiler = new Compiler($paths['path'], $paths['compiled_path'], $paths['cache_map']);
 	}	
 
 	public function getCompiledOutput() {
@@ -61,5 +61,4 @@ function showView (ViewResponse $view, $compiledFile) {
 		throw new \Exception("View rendering exception: ". $e->getMessage());
 		
 	}
-
 }

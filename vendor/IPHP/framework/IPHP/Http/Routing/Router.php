@@ -33,7 +33,6 @@ class Router {
 				'defaults',
 				'exceptions' => [
 					404,
-					403
 				]
 			],
 			'routes'
@@ -86,11 +85,12 @@ class Router {
 	 * @return [type] [description]
 	 */
 	public function findMatch () {
-		$url = $this->request->currentUrl();
+		$url 	= $this->request->currentUrl();
+		$method = $this->request->getMethod();
 
 		foreach ($this->registerdRoutes as $routeable) {
 			if ($routeable instanceof AbstractRoute) {
-				$match = $routeable->match($url, $this->defaultNamedGroups, $this);
+				$match = $routeable->match($url, $this->defaultNamedGroups, $this, $method);
 
 				if ($match) {
 					$this->routeMatch = $match;

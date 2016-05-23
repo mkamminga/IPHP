@@ -6,14 +6,30 @@ use IPHP\View\ViewResponse;
 class Compiler {
 	private $viewPath;
 	private $compiledPath;
+	private $cachemapPath;
 
-	public function __construct ($viewPath, $outputPath) {
-		$this->viewPath = $viewPath;
+	public function __construct ($viewPath, $outputPath, $cachemapPath) {
+		$this->viewPath 	= $viewPath;
 		$this->compiledPath = $outputPath;
+		$this->cachemapPath = $cachemapPath;
 	}
 
 	public function shouldCompile(ViewResponse $viewResponse) {
-		return !file_exists($this->getCompiledname($viewResponse));
+		$viewName = $this->getCompiledname($viewResponse);
+
+		if (!file_exists($this->viewPath . $viewResponse->getViewPath()) || !file_exists($this->cachemapPath . $viewResponse->getViewPath())) {
+			return true;
+		}
+
+		$cacheMap = include $this->cachemapPath . $viewResponse->getViewPath();
+		
+		foreach ($cacheMap as $path => $lastModTime) {
+			if (!file_exists($path) || filemtime($path) != $lastModTime){
+				return true;
+			}	
+		}
+		
+		return false;
 	}
 
 	public function getCompiledname (ViewResponse $viewResponse) {
@@ -27,10 +43,38 @@ class Compiler {
 		$masterView = $this->resolveParent($currentView);
 		$this->resolveSections($masterView);
 		$this->injectVarsIntoSections($currentView);
+
 		$output = $this->injectPHP($masterView->getOutput());
+		$name 	= $this->getCompiledname($viewResponse);
+		
+		return file_put_contents($this->cachemapPath . $name, $this->saveCacheMap($currentView)) &&
+			   file_put_contents($this->compiledPath . $name, $output);
 
-		return file_put_contents($this->compiledPath . $this->getCompiledname($viewResponse), $output);
+	}
 
+	private function saveCacheMap (ViewParser $view) {
+		$currentView = $view;
+		$now 		 = time();
+		$cacheMap = [];
+		while ($currentView) {
+			$path = $currentView->getPath();
+
+			$time = filemtime($path);
+			$cacheMap[$path] = $time;
+			$currentView = $currentView->getParent();
+		}
+		$output = '';
+		if  (!empty($cacheMap)) {
+			$output = '<?php $map=[];' . chr(13);
+
+			foreach ($cacheMap as $key => $value) {
+				$output.= '$map["'. $key.'"] = '. $value .';'. chr(13);
+			}
+
+			$output.= 'return $map;';
+		}
+
+		return $output;
 	}
 
 	private function resolveParent(ViewParser $currentView): ViewParser {
@@ -100,7 +144,7 @@ class Compiler {
 				} else {
 					$varExtracts = '<?php ';
 					foreach ($uses as $var) {
-						$varExtracts.= '$'. $var . '=$__view->getInjectedVar("'. $var .'");';
+						$varExtracts.= 'if (!isset($'. $var . ') || $'. $var . ' != $__view->getInjectedVar("'. $var .'")){$'. $var . '=$__view->getInjectedVar("'. $var .'");}';
 					}
 					$varExtracts.=' ?>';
 

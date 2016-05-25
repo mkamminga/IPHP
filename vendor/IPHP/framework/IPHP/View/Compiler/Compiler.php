@@ -48,7 +48,7 @@ class Compiler {
 		$name 	= $this->getCompiledname($viewResponse);
 		
 		return file_put_contents($this->cachemapPath . $name, $this->saveCacheMap($currentView)) &&
-			   file_put_contents($this->compiledPath . $name, '<?php use IPHP\View\Helpers\VH;?>' . $output);
+			   file_put_contents($this->compiledPath . $name, $output);
 
 	}
 

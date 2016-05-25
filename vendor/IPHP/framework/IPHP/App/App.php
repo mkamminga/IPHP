@@ -50,9 +50,9 @@ class App extends ServiceManager{
 
 	private function registerServices () {
 		if ($this->hasConfig('providers')) {
-			$this->services = $this->getConfig('providers');
+			$this->registeredServices = array_merge($this->registeredServices, $this->getConfig('providers')->data());
 		}
-		
+		$this->registerInstanceAlias('serviceManager', ServiceManager::class, $this);
 		$this->registerInstanceAlias('eventManager', EventManager::class, new EventManager($this));
 		$this->registerInstanceAlias('reflectorService', ReflectorService::class, new ReflectorService($this));
 		
@@ -117,8 +117,13 @@ class App extends ServiceManager{
 		} else if (array_key_exists($name, $this->aliasInstances)) {
 			return $this->instances[ $this->aliasInstances[$name] ];
 		} else if (array_key_exists($name, $this->registeredServices)) {
-			$this->instances[$name] = $this->registeredServices[$name]($this);
-			return $this->instances[$name];
+			try {
+				$this->instances[$name] = $this->getService('reflectorService')->createInstance($this->registeredServices[$name]);
+				return $this->instances[$name];
+			} catch (Exception $e) {
+				print("Couldn't create an instance of '". $name ."'; cause: ". $e->getMessage());
+				exit;
+			}
 		}
 		return NULL;
 	}

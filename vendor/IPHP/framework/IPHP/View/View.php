@@ -1,7 +1,7 @@
 <?php
 namespace IPHP\View;
 
-use IPHP\App\ReflectorService;
+use IPHP\App\ServiceManager;
 use IPHP\Http\Response;
 use IPHP\View\Compiler\Compiler;
 use IPHP\View\Helpers\VH;
@@ -10,13 +10,13 @@ class View {
 	private $viewResponse;
 	private $compiler;
 	private $paths = [];
+	private $serviceManager;
 
-	public function __construct (ViewResponse $viewResponse, array $paths = [], ReflectorService $reflectorService) {
+	public function __construct (ViewResponse $viewResponse, array $paths = [], ServiceManager $serviceManager) {
 		$this->paths = $paths;
 		$this->viewResponse = $viewResponse;
 		$this->compiler = new Compiler($paths['path'], $paths['compiled_path'], $paths['cache_map']);
-
-		VH::register($reflectorService);
+		$this->serviceManager = $serviceManager;
 	}	
 
 	public function getCompiledOutput() {
@@ -35,35 +35,30 @@ class View {
 	}
 
 	private function captureViewOutput ($compiledFile) {
-		return showView($this->viewResponse, $compiledFile);
+		try {
+			ob_start();
+			$__view = $this;
+			require $compiledFile;
+
+			$data = ob_get_contents();
+			ob_end_clean();
+
+			return $data;
+		} catch (\Exception $e) {
+			ob_end_clean();
+			var_dump($e);
+			throw new \Exception("View rendering exception: ". $e->getMessage() );
+			
+		}
+	}
+
+	public function service ($name = '') {
+		return $this->serviceManager->getService($name);
 	}
 
 	public function render () {
 		$httpResponse = $this->viewResponse->getHttpResponse();
 		$httpResponse->setBody($this->getCompiledOutput());
 		$httpResponse->send();
-	}
-}
-/**
- * extract data and prevent the calling of this
- * @param  ViewResponse $view         [description]
- * @param  [type]       $compiledFile [description]
- * @return [type]                     [description]
- */
-function showView (ViewResponse $view, $compiledFile) {
-	try {
-		ob_start();
-		$__view = $view;
-		require $compiledFile;
-
-		$data = ob_get_contents();
-		ob_end_clean();
-
-		return $data;
-	} catch (\Exception $e) {
-		ob_end_clean();
-		var_dump($e);
-		throw new \Exception("View rendering exception: ". $e->getMessage() );
-		
 	}
 }

@@ -29,14 +29,14 @@
 
         <section class="top-bar-section">
         <!-- Left Nav Section -->
-        <ul class="left">
+        <!--<ul class="left">
             @foreach ($menus as $menu)
                 <li><a href="{{url($menu->link)}}">{{ $menu->name }}</a></li>
             @endforeach
-        </ul>
+        </ul>-->
         
         <!-- Right Nav Section -->
-        <ul class="right">
+        <!--<ul class="right">
             @if (!$user)
                 <li>
                     <a href="/login">Log in</a>
@@ -55,7 +55,7 @@
                     </div>
                 </div>
             </li>
-        </ul>
+        </ul>-->
 
         </section>
     </nav>

@@ -1,11 +1,11 @@
 <?php
 namespace IPHP\App\Kernel;
-use IPHP\App\App;
+use IPHP\App\ServiceManager;
 
 abstract class Kernel {
 	protected $app;
 
-	public function __construct (App $app) {
+	public function __construct (ServiceManager $app) {
 		$this->app = $app;
 	}
 

@@ -7,13 +7,12 @@ use App\Guards\UserGuard;
 use App\Guards\UserSessionGuard;
 use App\User;
 
-class LoginController {
-	private $sm;
+class LoginController extends controller {
 	private $userGuard;
 	private $userSessionGuard;
 	
-	public function __construct(ServiceManager $serviceManager,UserGuard $userGuard, UserSessionGuard $userSessionGuard) {
-		$this->sm 				= $serviceManager;
+	public function __construct(ServiceManager $serviceManager, UserGuard $userGuard, UserSessionGuard $userSessionGuard) {
+		parent::__construct($serviceManager);
 		$this->userGuard 		= $userGuard;
 		$this->userSessionGuard = $userSessionGuard;
 	}
@@ -22,8 +21,9 @@ class LoginController {
 		return new ViewResponse("login.php");
 	}
 
-	public function loginPost (Request $request, User $user) {
-		if (!$this->userGuard->loggedIn()){
+	public function postLogin (Request $request, User $user) {
+		
+		if ($this->userGuard->loggedIn()){
 			$user = $user->find(1);
 
 			if (password_verify('test', $user->retreive('password'))) {
@@ -34,9 +34,15 @@ class LoginController {
 				//set loggedin
 				$this->userSessionGuard->setLoggedIn($user->retreive('id'));
 				$this->userGuard->setUser($user);
+
+				$this->redirect()->toRoute('LoginGet');
 			} else {
 				exit;
 			}
+		} else {
+			return $this->showLogin();
 		}
+
+
 	}
 }

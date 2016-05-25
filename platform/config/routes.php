@@ -13,12 +13,7 @@ return [
 		]
 	],
 	'routes' => [
-		new Route('HomeA', '/home', 'get', App\Controllers\HomeController::class, 'showHome'),
-		new RouteCollection('/subdir/[num:id]/[alpha_num:title]/', [App\Filters\UserLoggedinFilter::class => ["group" => "user"]], [
-			(new Route('HomeB', '/home', 'get', App\Controllers\HomeController::class, 'showHome'))->addCollection([
-				new Route('HomeC', '/home', 'get', App\Controllers\HomeController::class, 'showHome')
-			])
-		]),
-		new Route('LoginBase','/login', 'get', App\Controllers\LoginController::class, 'showLogin')
+		new Route('LoginGet','/login', 'get', App\Controllers\LoginController::class, 'showLogin'),
+		new Route('LoginPost','/login', 'post', App\Controllers\LoginController::class, 'postLogin')
 	]
 ];

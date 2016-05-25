@@ -1,5 +1,5 @@
 <?php
-namespace IPHP\View\Helpers;
+namespace IPHP\App\Helpers;
 
 use IPHP\Http\Routing\Router;
 

@@ -57,7 +57,6 @@ class UserSessionGuard {
 
 	public function logout () {
 		$this->sessionManager->set($this->sessionKey, NULL);
-
 		$this->id = 0;
 		$this->key = NULL;
 		$this->loggedIn = false;

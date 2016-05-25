@@ -13,7 +13,11 @@ return [
 		]
 	],
 	'routes' => [
-		new Route('LoginGet','/login', 'get', App\Controllers\LoginController::class, 'showLogin'),
-		new Route('LoginPost','/login', 'post', App\Controllers\LoginController::class, 'postLogin')
+		new Route('Home','/home?', 'get', App\Controllers\Frontend\HomeController::class, 'index'),
+		new Route('Home','/categories', 'get', App\Controllers\Frontend\CategoriesController::class, 'showGet'),
+		//Login
+		new Route('LoginGet','/login', 'get', App\Controllers\Frontend\LoginController::class, 'showLogin'),
+		new Route('LoginPost','/login', 'post', App\Controllers\Frontend\LoginController::class, 'postLogin'),
+		new Route('Logout','/logout', 'get', App\Controllers\Frontend\LoginController::class, 'logout')
 	]
 ];

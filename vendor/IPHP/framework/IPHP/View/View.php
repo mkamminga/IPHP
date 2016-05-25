@@ -37,7 +37,7 @@ class View {
 	private function captureViewOutput ($compiledFile) {
 		try {
 			ob_start();
-			$__view = $this;
+			$__view = $this->viewResponse;
 			require $compiledFile;
 
 			$data = ob_get_contents();

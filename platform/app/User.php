@@ -1,6 +1,7 @@
 <?php
 namespace App;
 
+use IPHP\Database\Where;
 use IPHP\Model\Model;
 use IPHP\Model\HasMany;
 
@@ -14,5 +15,13 @@ class User extends Model {
 
 	public function all () {
 		return $this->select();
+	}
+
+	public function findByName ($name) {
+		return $this->getOne(
+			$this->select()
+				 ->where((new Where)->equals('username', $name))
+				 ->limit(1)
+		);
 	}
 }

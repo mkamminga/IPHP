@@ -112,6 +112,11 @@ class Route extends AbstractRoute {
 
 	public function getUrlFromParams (array $params = [], array $namedGroups = []) {
 		$url = $this->url;
+
+		if (strlen($url) > 0 && $url[strlen($url) - 1] == '?') {
+			$url = substr($url, 0, -1);
+		}
+
 		if (!empty($params)) {
 			$url = preg_replace('/\(\?\<(.*?)\>\[(.*?)\]\)/', '[$1]', $url);
 
@@ -121,7 +126,7 @@ class Route extends AbstractRoute {
 		}
 
 		$pattern = $this->routePatternFromUrl($namedGroups);
-
+		
 		if (preg_match('/^'. $pattern .'$/', $url)) {
 			return $url;
 		} else {

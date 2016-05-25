@@ -1,5 +1,17 @@
->> parent('layout::main.layout.php')
->> section('content')
+<!doctype html>
+<html>
+<head>
+	<title>login</title>	
+	<meta charset="UTF-8">
+	    
+        <link rel="stylesheet" href="/css/foundation.min.css" />
+        <link rel="stylesheet" href="/css/main.css" />
+        <link rel="stylesheet" href="/css/foundation-icons.css" />
+        <script src="/js/vendor/modernizr.js"></script>
+</head>
+<body>
+<div id="main">
+	
 <div style="background-color: white">
     <div class="large-2 small-6 columns">
         <img src="/images/logo.png" style="width:100px;height:75px;">
@@ -70,8 +82,9 @@
         </section>
     </nav>
 </div>
+    <h1>Home</h1>
 
-<< show('fcontent', '')
+    <p>Welkom in de geweldige webshop van goldfingers!!!</p>
 
 <footer class="row">
     <div class="large-12 columns"><hr/>
@@ -101,38 +114,7 @@
         </div>
     </div>
 </footer>
-<< section('content')
+	</div>
 
->> section("scripts")
-
-<script src="/js/vendor/jquery.js"></script>
-<script src="/js/foundation.min.js"></script>
-<script>
-$(document).foundation();
-$(document).ready(function() {
-    $('.div-search').on('click','a.search' ,function() {
-        var value = $('.input-search').val();
-        if(value == '')
-        {
-            alert('Nothing to search please put in a word')
-        }
-        else {
-                $.ajax({
-                url: '/ajax/searchproduct/' + value,
-                method: "get",
-                dataType: 'json',
-                success: function (data) {
-                    if(data.found ==1) {
-                        window.location.replace("{{url('resultspage')}}");
-                    }
-                    else{
-                        alert(data.nothing);
-                    }
-                }
-            })
-        }
-    })
-});
-</script>
-<< section("scripts")
-
+</body>
+</html>

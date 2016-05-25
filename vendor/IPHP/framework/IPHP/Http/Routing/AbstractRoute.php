@@ -46,8 +46,12 @@ abstract class AbstractRoute {
 			$pattern = '/' . $pattern;
 		}
 
-		if (strlen($pattern) > 1 && $pattern[strlen($pattern) - 1] == '/') {
-			$pattern = substr($pattern, 0, strlen($pattern) - 1) . '[/]?';
+		if (strlen($pattern) > 1){ 
+			if ($pattern[strlen($pattern) - 1] == '/') {
+				$pattern = substr($pattern, 0, strlen($pattern) - 1) . '[/]?';
+			} else if ($pattern[strlen($pattern) - 1] == '?') {
+				$pattern = preg_replace('/(\/(.*?)\?)$/', '(/$2)?', $pattern);
+			}
 		}
 		
 		return str_replace('/', '\\/', $pattern);

@@ -11,7 +11,7 @@ trait LimitQueriable {
 	
 
 	public function limit (int $number) {
-		$this->limit = $limit;
+		$this->limit = $number;
 
 		return $this;
 	}

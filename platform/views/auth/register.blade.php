@@ -16,8 +16,6 @@
 
         <h1>Register</h1>
         <form method="POST" action="/register">
-            {!! csrf_field() !!}
-
             <div>
                 Username
                 <input type="text" name="username" value="{{ old('username') }}">

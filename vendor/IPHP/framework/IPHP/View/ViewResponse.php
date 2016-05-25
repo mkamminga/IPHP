@@ -25,6 +25,8 @@ class ViewResponse {
 
 	public function setVar ($key, $value) {
 		$this->vars[$key] = $value;
+
+		return $this;
 	}
 
 	public function getInjectedVar ($name) {

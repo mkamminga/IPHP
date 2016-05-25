@@ -1,7 +1,7 @@
 <?php
-namespace IPHP\Validation\Validator;
+namespace IPHP\Validation;
 
-use IPHP\Translations\Translator;
+use IPHP\Translation\Translator;
 
 class Validator {
 	private $translator;
@@ -9,10 +9,11 @@ class Validator {
 	private $errors = [];
 	private $rules = [];
 	protected $requirementToMethodMap = [
-		'required' => 'validateRequired',
-		'email' => 'validateEmail',
-		'min' => 'validateMin',
-		'max' => 'ValidateMax'
+		'required' 	=> 'validateRequired',
+		'alpha_num' => 'validateAlphaNum',
+		'email' 	=> 'validateEmail',
+		'min' 		=> 'validateMin',
+		'max' 		=> 'ValidateMax'
 	];
 
 	public function __construct (Translator $translator) {
@@ -25,7 +26,7 @@ class Validator {
 		}
 	}
 
-	public function validate ($data):bool {
+	public function validate (array $data = []):bool {
 		foreach ($this->rules as $rule) {
 			$inputName 	= $rule->getInputname();
 			$methods 	= $rule->getRequirements();
@@ -35,18 +36,17 @@ class Validator {
 				$bounds = [];
 				$methodFromRule = '';
 				$this->setRuleAndBounds($method, $methodFromRule, $bounds);
-				if (!isset($this->requirementToMethodMap[$methodFromRule]) || !method_exists($this, $this->requirementToMethodMap[$methodFromRule])) {
 
-					
+				if (isset($this->requirementToMethodMap[$methodFromRule]) && method_exists($this, $this->requirementToMethodMap[$methodFromRule])) {
+
 					$realMethod = $this->requirementToMethodMap[$methodFromRule];
-
 					if (!$this->{$realMethod}($value, $bounds)) {
-						$this->errors[$inputName] = $this->parseMessage($methodFromRule, $inputName, $bounds);	
+						$this->errors[$inputName] = $this->parseMessage($methodFromRule, $rule->getFieldname(), $bounds);	
 
 						break;
 					}
 				} else {
-					throw new \MethodNotFoundException($methodFromRule);
+					throw new \Exception("No method found for rule: ". $methodFromRule);
 				}
 			}
 		}
@@ -56,7 +56,8 @@ class Validator {
 
 	private function setRuleAndBounds ($rule, &$method, &$bounds) {
 		$data 	= explode(':', $rule);
-		if (count($data) > 0) {
+		if (count($data) > 1) {
+			var_dump($data);
 			$settings = explode('|', $data[1]);
 			foreach ($settings as $setting) {
 				list($key, $value) = explode('=', $setting);
@@ -71,7 +72,7 @@ class Validator {
 	private function parseMessage ($key, $fieldname, $bounds):string {
 		$rawMessage = $this->translator->get('validator', $key);
 		array_walk($bounds, function ($first, &$key) {
-			$key = ':'. $key
+			$key = ':'. $key;
 		});
 
 		$bounds[':field'] = $fieldname;
@@ -92,8 +93,13 @@ class Validator {
 		return !empty($data);
 	}
 
-
 	private function validateEmail ($email):bool {
+		//
+		//
+		return false;
+	}
 
+	private function validateAlphaNum ($data):bool {
+		return preg_match('/^[a-zA-Z0-9_\.\@]+$/', $data);
 	}
 }

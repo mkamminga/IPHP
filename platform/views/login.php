@@ -2,7 +2,7 @@
 
 >> section('title', 'login')
 >> section('fcontent')
-
+    >> uses errors
 <div class="row">
     <div class="large-12 columns">
 
@@ -11,9 +11,13 @@
         ?>
             <div data-alert="" class="alert-box alert">
                 <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
+                    <?php
+                    foreach ($errors as $error):
+                    ?>
+                        <li><?php print($error); ?></li>
+                    <?php
+                    endforeach;
+                    ?>
                 </ul>
                 
             </div>

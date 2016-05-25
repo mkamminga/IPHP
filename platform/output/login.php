@@ -12,7 +12,7 @@
 <body>
 <div id="main">
 	
-<div class="fixed"  style="background-color: white">
+<div style="background-color: white">
     <div class="large-2 small-6 columns">
         <img src="/images/logo.png" style="width:100px;height:75px;">
     </div>
@@ -41,22 +41,32 @@
 
         <section class="top-bar-section">
         <!-- Left Nav Section -->
-        <!--<ul class="left">
+        <ul class="left">
+            <li><a href="<?php print($this->service('url')->route('Home'));?>">Home</a>
             @foreach ($menus as $menu)
                 <li><a href="{{url($menu->link)}}">{{ $menu->name }}</a></li>
             @endforeach
-        </ul>-->
+        </ul>
         
+        <?php
+        $user = $this->service('userGuard');
+        ?>
         <!-- Right Nav Section -->
-        <!--<ul class="right">
-            @if (!$user)
+        <ul class="right">
+            <?php
+            if (!$user->loggedIn()):
+            ?>
                 <li>
                     <a href="/login">Log in</a>
                 </li>
-            @else
-                <li><a href="#">Welkom: {{ $user->name  . ' '. $user->lastname}}</a></li> 
+            <?php
+            else:
+            ?>
+                <li><a href="#">Welkom: <?php print($user->getUsername()); ?></a></li> 
                 <li><a href="/logout">Log out</a></li>
-            @endif    
+            <?php
+            endif;
+            ?>
             <li class="has-form">
                 <div class="row collapse div-search">
                     <div class="large-8 small-9 columns">
@@ -71,9 +81,8 @@
 
         </section>
     </nav>
-</div>
-
-<div class="row">
+</div><?php if (!isset($errors) || $errors != $__view->getInjectedVar("errors")){$errors=$__view->getInjectedVar("errors");} ?>
+    <div class="row">
     <div class="large-12 columns">
 
         <?php
@@ -81,9 +90,13 @@
         ?>
             <div data-alert="" class="alert-box alert">
                 <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
+                    <?php
+                    foreach ($errors as $error):
+                    ?>
+                        <li><?php print($error); ?></li>
+                    <?php
+                    endforeach;
+                    ?>
                 </ul>
                 
             </div>

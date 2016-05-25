@@ -9,6 +9,14 @@ class UserGuard {
 		$this->user = $user;
 	}
 
+	public function getUsername () {
+		if ($this->user) {
+			return $this->user->retreive('username');
+		}
+
+		return '';
+	}
+
 	public function loggedIn () {
 		return $this->user != NULL;
 	}

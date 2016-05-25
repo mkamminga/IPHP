@@ -13,11 +13,15 @@ return [
 		]
 	],
 	'routes' => [
-		new Route('Home','/home?', 'get', App\Controllers\Frontend\HomeController::class, 'index'),
-		new Route('Home','/categories', 'get', App\Controllers\Frontend\CategoriesController::class, 'showGet'),
-		//Login
-		new Route('LoginGet','/login', 'get', App\Controllers\Frontend\LoginController::class, 'showLogin'),
-		new Route('LoginPost','/login', 'post', App\Controllers\Frontend\LoginController::class, 'postLogin'),
-		new Route('Logout','/logout', 'get', App\Controllers\Frontend\LoginController::class, 'logout')
+		new RouteCollection('', [App\Filters\RegisterViewComposerFilter::class => []], [
+			new Route('Home','/home?', 'get', App\Controllers\Frontend\HomeController::class, 'index'),
+			(new Route('Categories','/categories', 'get', App\Controllers\Frontend\CategoriesController::class, 'showSubcategories'))->addCollection([
+				new Route('CategoryProducts', '/[num:subcategory]/products', 'get', App\Controllers\Frontend\CategoriesController::class, 'showProducts')
+			]),
+			//Login
+			new Route('LoginGet','/login', 'get', App\Controllers\Frontend\LoginController::class, 'showLogin'),
+			new Route('LoginPost','/login', 'post', App\Controllers\Frontend\LoginController::class, 'postLogin'),
+			new Route('Logout','/logout', 'get', App\Controllers\Frontend\LoginController::class, 'logout')
+		])
 	]
 ];

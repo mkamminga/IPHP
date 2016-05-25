@@ -10,9 +10,15 @@ class Request {
 	public function __construct () {
 		//setup the vars correctly
 		$this->baseUrl = dirname($_SERVER['SCRIPT_NAME']);
-		$this->currentUrl = str_replace($this->baseUrl, '', urldecode($_SERVER['REQUEST_URI']));
-		if (strlen($this->currentUrl) > 0 && $this->currentUrl[0] != "/"){
+		$this->currentUrl = urldecode($_SERVER['REQUEST_URI']);
+		if (strlen($this->baseUrl) > 1){
+			$this->currentUrl = str_replace($this->baseUrl, '', $this->currentUrl);
+		}
+		$currentUrlLength = strlen($this->currentUrl);
+		if ($currentUrlLength > 1 && $this->currentUrl[0] != "/"){
 			$this->currentUrl = '/' . $this->currentUrl;
+		} else if ($currentUrlLength == 1 &&  $this->currentUrl[0] == '/') {
+			$this->currentUrl = '';
 		}
 	}
 	/**

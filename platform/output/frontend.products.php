@@ -11,8 +11,8 @@
 </head>
 <body>
 <div id="main">
-	<?php if (!isset($menus) || $menus != $__view->getInjectedVar("menus")){$menus=$__view->getInjectedVar("menus");}if (!isset($breadcrumbs) || $breadcrumbs != $__view->getInjectedVar("breadcrumbs")){$breadcrumbs=$__view->getInjectedVar("breadcrumbs");} ?>
-        <div style="background-color: white">
+	<?php if (!isset($menus) || $menus != $__view->getInjectedVar("menus")){$menus=$__view->getInjectedVar("menus");}if (!isset($breadcrumbs) || $breadcrumbs != $__view->getInjectedVar("breadcrumbs")){$breadcrumbs=$__view->getInjectedVar("breadcrumbs");}if (!isset($userGuard) || $userGuard != $__view->getInjectedVar("userGuard")){$userGuard=$__view->getInjectedVar("userGuard");} ?>
+            <div style="background-color: white">
     <div class="large-2 small-6 columns">
         <img src="/images/logo.png" style="width:100px;height:75px;">
     </div>
@@ -51,14 +51,11 @@
             endforeach;
             ?>
         </ul>
-        
-        <?php
-        $user = $this->service('userGuard');
-        ?>
+    
         <!-- Right Nav Section -->
         <ul class="right">
             <?php
-            if (!$user->loggedIn()):
+            if (!$userGuard->loggedIn()):
             ?>
                 <li>
                     <a href="/login">Log in</a>
@@ -66,7 +63,7 @@
             <?php
             else:
             ?>
-                <li><a href="#">Welkom: <?php print($user->getUsername()); ?></a></li> 
+                <li><a href="#">Welkom: <?php print($userGuard->getUsername()); ?></a></li> 
                 <li><a href="/logout">Log out</a></li>
             <?php
             endif;

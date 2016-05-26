@@ -4,6 +4,7 @@ namespace IPHP\Http\Routing;
 abstract class AbstractRoute {
 	protected $url = '';
 	protected $filters = [];
+	protected $registerd = false;
 
 	public function __construct ($url, array $filters = []) {
 		$this->url = preg_replace('/\[([a-z0-9_]+)(\:)([a-z0-9_]+)\]/', '(?<$3>[$1])', $url);
@@ -21,22 +22,26 @@ abstract class AbstractRoute {
 	abstract public function match($url, array $groups = [], Router $router, $method = 'get');
 	
 	public function register(AbstractRoute $registerable){
-		$parentRoute = $registerable->getUrl();
-		$checkAndChangeTrailingSlash = function ($url){
-			if (strlen($url) > 0 && $url[0] != '/') {
-				$url = '/' . $url;
+		if (!$this->registerd){
+			$parentRoute = $registerable->getUrl();
+
+			$checkAndChangeTrailingSlash = function ($url){
+				if (strlen($url) > 0 && $url[0] != '/') {
+					$url = '/' . $url;
+				}
+				return $url;
+			};
+
+			$this->url = $checkAndChangeTrailingSlash($this->url);
+
+			if (strlen($this->url) > 0 && $this->url[0] != '/') {
+				$this->url = '/' . $this->url;
 			}
-			return $url;
-		};
-
-		$this->url = $checkAndChangeTrailingSlash($this->url);
-
-		if (strlen($this->url) > 0 && $this->url[0] != '/') {
-			$this->url = '/' . $this->url;
+			$this->url = $parentRoute . $this->url;
+			$this->url = str_replace('//', '/', $this->url);
+			$this->url = $checkAndChangeTrailingSlash($this->url);
+			$this->registerd = true;
 		}
-		$this->url = $parentRoute . $this->url;
-		$this->url = str_replace('//', '/', $this->url);
-		$this->url = $checkAndChangeTrailingSlash($this->url);
 	}
 
 	protected function routePatternFromUrl (array $namedGroups = []) {
@@ -50,7 +55,7 @@ abstract class AbstractRoute {
 			if ($pattern[strlen($pattern) - 1] == '/') {
 				$pattern = substr($pattern, 0, strlen($pattern) - 1) . '[/]?';
 			} else if ($pattern[strlen($pattern) - 1] == '?') {
-				$pattern = preg_replace('/(\/(.*?)\?)$/', '(/$2)?', $pattern);
+				$pattern = preg_replace('/(\/([^\/]*)\?)$/', '(/$2)?', $pattern);
 			}
 		}
 		

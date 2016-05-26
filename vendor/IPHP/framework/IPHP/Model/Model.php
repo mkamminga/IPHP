@@ -102,7 +102,7 @@ class Model {
 			$prototype = new static;
 			$prototype->onSave = 'update';
 
-			if ($single || count($results) == 1) {
+			if ($single) {
 				$prototype->fields = $results;
 				$collection[] = $prototype;
 			} else {

@@ -1,4 +1,18 @@
-- validation
+- backoffice 
+	- login
+		- auth filter: role=admin
+	- categories
+	- products (subcategory)
+	- orders
+	- navigation
+-frontend
+	- categories
+	- registration
+	- product item
+	- shopping cart
+	- ordering process
+		- shopping cart
+		- confirmation 
+			- mail
 - mail
 - 404handler
-- login controller

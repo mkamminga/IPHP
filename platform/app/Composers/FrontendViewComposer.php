@@ -5,17 +5,11 @@ use IPHP\App\ServiceManager;
 use Breadcrumbs\BreadcrumbResolver;
 use App\Navigation;
 
-class ViewComposer {
-	private $sm;
-
-	public function __construct (ServiceManager $sm) {
-		$this->sm = $sm;
-	}
-
+class FrontendViewComposer extends MainViewComposer {
 	public function resolveBreadCrumbs () {
 		if ($this->sm->hasService('viewResponse')) {
-			$viewResponse = $this->sm->getService('viewResponse');
-			$router = $this->sm->getService('router');
+			$viewResponse 	= $this->sm->getService('viewResponse');
+			$router 		= $this->sm->getService('router');
 
 			$breadCrumbs 	= include config_path . DIRECTORY_SEPARATOR .  'breadcrumbs.php';
 			$resolver 		= new BreadcrumbResolver($router, $breadCrumbs);
@@ -36,6 +30,8 @@ class ViewComposer {
 	}
 
 	public function compose () {
+		parent::compose();
+
 		$this->resolveBreadCrumbs();
 		$this->resolveMenu();
 	}

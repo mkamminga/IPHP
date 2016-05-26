@@ -63,7 +63,7 @@ class Route extends AbstractRoute {
 		$results = [];
 		
 		$pattern = $this->routePatternFromUrl($namedGroups);
-
+		
 		if (($method == 'all' || $this->callableByMethod == $method) 
 			&& preg_match('/^'. $pattern .'$/', $url, $results)) {
 			$this->registerFilters($router);

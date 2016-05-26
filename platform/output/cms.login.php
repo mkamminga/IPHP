@@ -1,9 +1,18 @@
->> parent('layout::frontend.php')
-
->> section('title', 'login')
->> section('fcontent')
-    >> uses errors
-<div class="row">
+<!doctype html>
+<html>
+<head>
+	<title>login</title>	
+	<meta charset="UTF-8">
+	    
+        <link rel="stylesheet" href="/css/foundation.min.css" />
+        <link rel="stylesheet" href="/css/main.css" />
+        <link rel="stylesheet" href="/css/foundation-icons.css" />
+        <script src="/js/vendor/modernizr.js"></script>
+</head>
+<body>
+<div id="main">
+	<?php if (!isset($errors) || $errors != $__view->getInjectedVar("errors")){$errors=$__view->getInjectedVar("errors");} ?>
+    <div class="row">
     <div class="large-12 columns">
 
         <?php
@@ -28,6 +37,7 @@
         <?php
         $input = $this->service('input');
         ?>
+        <hr />
         <form method="POST" action="">
             <div class="large-3 rows">
                 Username
@@ -40,15 +50,12 @@
             </div>
 
             <div>
-                <input type="checkbox" name="remember"> Remember Me
-            </div>
-
-            <div>
                 <button type="submit">Login</button>
             </div>
         </form>
-        <hr />
-        <a class="small button secondary" href="/register">New user? Register here!</a>
     </div>
 </div>  
-<< section('fcontent')
+	</div>
+
+</body>
+</html>

@@ -11,9 +11,10 @@ class Validator {
 	protected $requirementToMethodMap = [
 		'required' 	=> 'validateRequired',
 		'alpha_num' => 'validateAlphaNum',
+		'num'		=> 'validateNum',
 		'email' 	=> 'validateEmail',
-		'min' 		=> 'validateMin',
-		'max' 		=> 'ValidateMax'
+		'min' 		=> 'validateMinSize',
+		'max' 		=> 'validateMaxSize',
 	];
 
 	public function __construct (Translator $translator) {
@@ -35,6 +36,7 @@ class Validator {
 			foreach ($methods as $method) {
 				$bounds = [];
 				$methodFromRule = '';
+				//extracts extra params from rules (size:... -> size and an array of bounds)
 				$this->setRuleAndBounds($method, $methodFromRule, $bounds);
 
 				if (isset($this->requirementToMethodMap[$methodFromRule]) && method_exists($this, $this->requirementToMethodMap[$methodFromRule])) {
@@ -57,7 +59,6 @@ class Validator {
 	private function setRuleAndBounds ($rule, &$method, &$bounds) {
 		$data 	= explode(':', $rule);
 		if (count($data) > 1) {
-			var_dump($data);
 			$settings = explode('|', $data[1]);
 			foreach ($settings as $setting) {
 				list($key, $value) = explode('=', $setting);
@@ -71,13 +72,15 @@ class Validator {
 
 	private function parseMessage ($key, $fieldname, $bounds):string {
 		$rawMessage = $this->translator->get('validator', $key);
-		array_walk($bounds, function ($first, &$key) {
-			$key = ':'. $key;
-		});
+		$replaceable = [];
 
-		$bounds[':field'] = $fieldname;
+		foreach ($bounds as $key => $value) {
+			$replaceable[':' . $key] = $value;
+		}
 
-		return str_replace(array_keys($bounds), array_values($bounds), $rawMessage);
+		$replaceable[':field'] = $fieldname;
+
+		return str_replace(array_keys($replaceable), array_values($replaceable), $rawMessage);
 
 	}
 
@@ -87,6 +90,10 @@ class Validator {
 
 	public function getErrors ():array {
 		return $this->errors;
+	}
+
+	public function addError (string $key, string $error) {
+		$this->errors[$key] = $error;
 	}
 
 	private function validateRequired ($data):bool {
@@ -101,5 +108,17 @@ class Validator {
 
 	private function validateAlphaNum ($data):bool {
 		return preg_match('/^[a-zA-Z0-9_\.\@]+$/', $data);
+	}
+
+	private function validateNum ($data):bool {
+		return preg_match('/^[0-9]+$/', $data);
+	}
+
+	private function validateMinSize ($data, array $bounds): bool{
+		return (isset($bounds['size']) && strlen($data) >  (int)$bounds['size']);
+	}
+
+	private function validateMaxSize ($data, array $bounds): bool{
+		return (isset($bounds['size']) && strlen($data) < (int)$bounds['size']);
 	}
 }

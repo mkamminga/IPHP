@@ -1,7 +1,7 @@
->> parent('layout::frontend.php')
+>> parent('layout::main.layout.php')
 
 >> section('title', 'login')
->> section('fcontent')
+>> section('content')
     >> uses errors
 <div class="row">
     <div class="large-12 columns">
@@ -28,6 +28,7 @@
         <?php
         $input = $this->service('input');
         ?>
+        <hr />
         <form method="POST" action="">
             <div class="large-3 rows">
                 Username
@@ -40,15 +41,9 @@
             </div>
 
             <div>
-                <input type="checkbox" name="remember"> Remember Me
-            </div>
-
-            <div>
                 <button type="submit">Login</button>
             </div>
         </form>
-        <hr />
-        <a class="small button secondary" href="/register">New user? Register here!</a>
     </div>
 </div>  
-<< section('fcontent')
+<< section('content')

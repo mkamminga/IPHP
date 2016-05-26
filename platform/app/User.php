@@ -3,14 +3,14 @@ namespace App;
 
 use IPHP\Database\Where;
 use IPHP\Model\Model;
-use IPHP\Model\HasMany;
+use IPHP\Model\BelongsTo;
 
 class User extends Model {
 	protected $table = 'users';
 	protected $primaryKeys = ['id'];
 
-	public function orders () {
-		return new HasMany(new FirstModel, 'Users_id', 'id', 'orders');
+	public function role () {
+		return new BelongsTo(new UserGroup, 'id', 'group_id', 'role');
 	}
 
 	public function all () {
@@ -20,7 +20,7 @@ class User extends Model {
 	public function findByName ($name) {
 		return $this->getOne(
 			$this->select()
-				 ->where((new Where)->equals('username', $name))
+				 ->where((new Where)->equals('username', $name)->equals('active', 1))
 				 ->limit(1)
 		);
 	}

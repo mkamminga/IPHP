@@ -1,11 +1,11 @@
 <?php
 namespace App\Controllers\Frontend;
 
-use IPHP\View\ViewResponse;
+use App\Controllers\Controller;
 
-class HomeController {
+class HomeController extends Controller {
 	public function index () {
-		return new ViewResponse("frontend/home.php");
+		return $this->view("frontend::home.php");
 	}
 
 }

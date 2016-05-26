@@ -64,8 +64,12 @@ class Clause extends Queriable {
 		return $this;
 	}
 
-	public function in ($field, array $values = [], $andOr = 'AND') {
-		$this->append($andOr, $field . ' IN (?'. str_repeat(',?', count($values) -1) .')', $values);
+	public function in ($field, array $values, $andOr = 'AND') {
+		if (count($values) > 0){
+			$this->append($andOr, $field . ' IN (?'. (count($values) > 1 ? str_repeat(',?', count($values) -1) : '') .')', $values);
+		} else {
+			throw new \Exception("In requires more than one value!");
+		}
 		return $this;
 	}
 

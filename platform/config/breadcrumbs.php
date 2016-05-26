@@ -10,7 +10,7 @@ return [
 		Breadcrumb::make('Categories', [], function (Breadcrumb $breadcrumb, array $params = []) {
 			$breadcrumb->setTitle('Categories');
 		})->setChild(
-			Breadcrumb::make('CategoryProducts', ['subcategory'], function (Breadcrumb $breadcrumb, array $params = []) {
+			Breadcrumb::make('CategoryProducts', ['subcategory'], function (Breadcrumb $breadcrumb, array $params) {
 				//Set the title of the current category
 				$category = new App\Category;
 				$category = $category->find($params['subcategory']);
@@ -18,5 +18,5 @@ return [
 				$breadcrumb->setTitle('Category : '. $category->retreive('name'));
 			})
 		)
-	);
+	)
 ];

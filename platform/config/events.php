@@ -19,7 +19,7 @@ return [
 			
 			if ($userSessionGuard->loggedIn()) {
 				if ($userSessionGuard->same($key)) {
-					$user 		= $user->find((int)$userSessionGuard->getId());
+					$user 		= $user->with('role')->find((int)$userSessionGuard->getId());
 					$userGuard->setUser($user);
 				} else {
 					$userSessionGuard->logout();

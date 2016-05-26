@@ -22,11 +22,14 @@ class UserGuard {
 	}
 
 	public function hasRole ($name = '') {
-		//
+		$group = $this->user->getRelated('role');
+
+		return strtolower($name) == strtolower($group->retreive('name'));
 	}
 
 	public function isAdmin () {
-		return $this->loggedIn() && $this->user->hasRole('admin');
+		return $this->loggedIn() 
+			&& ($this->hasRole('admin') || $this->hasRole('cmsadmin') || $this->hasRole('superadmin'));
 	}
 
 	public function isGuest () {

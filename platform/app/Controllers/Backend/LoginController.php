@@ -1,24 +1,27 @@
 <?php
-namespace App\Controllers\Frontend;
-use App\Controllers\AuthController;
+namespace App\Controllers\Backend;
+
 use IPHP\Validation\Validator;
 use IPHP\App\ServiceManager;
 use IPHP\Http\Request;
+use IPHP\View\ViewResponse;
+
+use App\Controllers\AuthController;
 use App\User;
 
 class LoginController extends AuthController {
 
 	public function showLogin () {
 		if ($this->userGuard->loggedIn()){
-			$this->redirect()->to('/');
+			$this->redirect()->toRoute('Dashboard');
 		}
 
-		return $this->view("login.php");
+		return new ViewResponse("cms::login.php");
 	}
 
 	public function postLogin (Request $request, User $user, Validator $validator) {
 		if ($this->login($request, $user, $validator)){
-			$this->redirect()->toRoute('Home');
+			$this->redirect()->toRoute('Dashboard');
 		} else {
 			return $this->showLogin()->setVar('errors', $validator->getErrors());
 		}
@@ -27,6 +30,6 @@ class LoginController extends AuthController {
 	public function logout () {
 		//set loggedin
 		$this->userSessionGuard->logout();
-		$this->redirect()->toRoute('Home');
+		$this->redirect()->toRoute('Dashboard');
 	}
 }

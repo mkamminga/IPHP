@@ -158,6 +158,7 @@ class Router {
 	 * @return [type] [description]
 	 */
 	public function getFilters ():array {
+
 		return $this->filters;
 	}
 	/**

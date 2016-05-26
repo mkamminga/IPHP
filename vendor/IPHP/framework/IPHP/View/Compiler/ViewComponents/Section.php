@@ -63,7 +63,7 @@ class Section extends AbstractShowParser {
 			return '[parent]';
 		}, $this->content);
 
-		$this->content = preg_replace_callback('/[\n\r]*>>\s+uses\s([a-z0-9_]+)[\n\r]*/', function ($matches) {
+		$this->content = preg_replace_callback('/[\n\r]*>>\s+uses\s([a-zA-Z0-9_]+)[\n\r]*/', function ($matches) {
 			$this->uses[] = $matches[1];
 
 			return '';

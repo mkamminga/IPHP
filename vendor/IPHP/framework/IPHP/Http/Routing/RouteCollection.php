@@ -13,12 +13,11 @@ class RouteCollection extends AbstractRoute {
 		$pattern = $this->routePatternFromUrl($namedGroups);
 
 		if (preg_match('/^'. $pattern .'/', $url)) {
-			$this->registerFilters($router);
-
 			foreach ($this->subRoutes as $route) {
 				$route->register($this);
 				$match = $route->match($url, $namedGroups, $router, $method);
 				if ($match) {
+					$this->registerFilters($router);
 					return $match;
 				}
 			}

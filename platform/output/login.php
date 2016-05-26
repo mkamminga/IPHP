@@ -11,8 +11,8 @@
 </head>
 <body>
 <div id="main">
-	
-<div style="background-color: white">
+	<?php if (!isset($menus) || $menus != $__view->getInjectedVar("menus")){$menus=$__view->getInjectedVar("menus");}if (!isset($breadcrumbs) || $breadcrumbs != $__view->getInjectedVar("breadcrumbs")){$breadcrumbs=$__view->getInjectedVar("breadcrumbs");} ?>
+        <div style="background-color: white">
     <div class="large-2 small-6 columns">
         <img src="/images/logo.png" style="width:100px;height:75px;">
     </div>
@@ -43,9 +43,13 @@
         <!-- Left Nav Section -->
         <ul class="left">
             <li><a href="<?php print($this->service('url')->route('Home'));?>">Home</a>
-            @foreach ($menus as $menu)
-                <li><a href="{{url($menu->link)}}">{{ $menu->name }}</a></li>
-            @endforeach
+            <?php
+            foreach ($menus as $menu):
+            ?>
+                <li><a href="<?php print($menu->retreive('link')); ?>"><?php print($menu->retreive('name')); ?></a></li>
+            <?php
+            endforeach;
+            ?>
         </ul>
         
         <?php
@@ -81,12 +85,30 @@
 
         </section>
     </nav>
+</div>
+
+<div class="breadcrumbs">
+<?php
+if (isset($breadcrumbs)):
+?>
+<ul class="right">
+<?php
+    foreach ((array)$breadcrumbs as $breadcrumb):
+?>
+    <li><a href="<?php print($breadcrumb->getUrl()); ?>"><?php print($breadcrumb->getTitle()); ?></a></li>
+<?php
+    endforeach;
+?>
+</ul>
+<?php
+endif;
+?>
 </div><?php if (!isset($errors) || $errors != $__view->getInjectedVar("errors")){$errors=$__view->getInjectedVar("errors");} ?>
     <div class="row">
     <div class="large-12 columns">
 
         <?php
-        if (isset($errors) && count($errors) > 0):
+        if (isset($errors) && count((array)$errors) > 0):
         ?>
             <div data-alert="" class="alert-box alert">
                 <ul>
@@ -104,14 +126,13 @@
         endif;
         ?>
         <h1>Login</h1>
-        <a href="<?php print($this->service('url')->route('LoginGet')); ?>">URL</a>
         <?php
         $input = $this->service('input');
         ?>
         <form method="POST" action="">
             <div class="large-3 rows">
                 Username
-                <input type="text" name="username" value="<?php print($input->escaped('username')) ?>">
+                <input type="text" name="username" value="<?php print($input->raw('username')) ?>">
             </div>
 
             <div class="large-3 rows">

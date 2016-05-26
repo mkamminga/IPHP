@@ -2,15 +2,21 @@
 namespace IPHP\App\Helpers;
 
 use IPHP\Http\Request;
+use IPHP\Model\Model;
 
 class Input {
 	private $request;
+	private $model = NULL;
 	public function __construct (Request $request) {
 		$this->request = $request;
 	}
 
+	public function setModel (Model $model) {
+		$this->model = $model;
+	}
+
 	public function get (string $name) {
-		$data = $this->request->get($name);
+		$data = $this->retreive($name);
 
 		if ($data != NULL) {
 			$data = filter_var($data, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -20,11 +26,11 @@ class Input {
 	}
 
 	public function raw (string $name) {
-		return $this->request->get($name);
+		return $this->retreive($name);
 	}
 
 	public function escaped (string $name) {
-		$data = $this->request->get($name);
+		$data = $this->retreive($name);
 		if ($data == NULL) {
 			return $data;
 		}
@@ -64,5 +70,13 @@ class Input {
 		}, $data);
 		
 		return $result;
+    }
+
+    private function retreive ($name) {
+    	if ($this->model != NULL && !in_array($this->request->getMethod(), ['post', 'put', 'delete'])) {
+    		return $this->model->retreive($name);
+    	} 
+
+    	return $this->request->get($name);
     }
 }

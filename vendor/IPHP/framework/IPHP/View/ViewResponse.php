@@ -9,7 +9,7 @@ class ViewResponse {
 	private $httpResponse;
 
 	public function __construct ($viewPath, array $vars = []) {
-		$this->viewPath = $viewPath;
+		$this->viewPath = str_replace('::', DIRECTORY_SEPARATOR, $viewPath);
 		$this->vars = $vars;
 
 		$this->httpResponse = new Response;

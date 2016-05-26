@@ -13,21 +13,23 @@ class HasOne extends ModelRelation {
 
 		$values = array_keys($this->keys);
 
-		$all = $this->model->get($this->model->select()->where(
-			$this->where->in($this->primaryKey, $values)
-		));
-		
-		if ($all){
-			foreach ($all as $related) {
-				$key = $related->retreive($this->primaryKey);
+		if (count($values) > 0) {
 
-				if ($key != null && array_key_exists($key, $this->keys)) {
-					foreach ($this->keys[$key] as $model) {
-						$model->setRelated($this->name, $related);
+			$all = $this->model->get($this->model->select()->where(
+				$this->where->in($this->primaryKey, $values)
+			));
+
+			if ($all){
+				foreach ($all as $related) {
+					$key = $related->retreive($this->primaryKey);
+
+					if ($key != null && array_key_exists($key, $this->keys)) {
+						foreach ($this->keys[$key] as $model) {
+							$model->setRelated($this->name, $related);
+						}
 					}
 				}
 			}
 		}
-
 	}
 }

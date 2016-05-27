@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-	<title>Navigatie bewerken</title>	
+	<title>Categories</title>	
 	<meta charset="UTF-8">
 	    
         <link rel="stylesheet" href="/css/foundation.min.css" />
@@ -45,49 +45,40 @@
             </div>
             
             <div class="large-9 columns">    
-                <h2> Navigatie bewerken</h2>
+                <h2> Categories</h2>
                 <div class="content">
-                    <?php if (!isset($errors) || $errors != $__view->getInjectedVar("errors")){$errors=$__view->getInjectedVar("errors");}if (!isset($navigation) || $navigation != $__view->getInjectedVar("navigation")){$navigation=$__view->getInjectedVar("navigation");} ?>
-		    <?php
-    if (isset($errors)):
-    	print($this->service('htmlMessages')->errors($errors));
-    endif;
-
-    $form = $this->service('form');
-	$input = $this->service('input');
-	$input->setModel($navigation);
+                    <?php if (!isset($categories) || $categories != $__view->getInjectedVar("categories")){$categories=$__view->getInjectedVar("categories");} ?>
+		<?php
+	$url = $this->service('url');
 	?>
-	<form action="" method="post">
-		<div class="row">
-		    <div class="large-12 columns">
-		      <label>Naam
-		        <?php print($form->text('name', $input->raw('name'))); ?>
-		      </label>
-		    </div>
-		</div>
+	<a href="<?php print($url->route('CategoriesShowAdd')) ?>" class="button success">Nieuwe categorie</a>
+	<table>
+		<thead>
+			<tr>
+				<th>Acties</th>
+				<th>Naam</th>
+				<th>Hoofd</th>
+			</tr>
+		</thead>
 
-		<div class="row">
-		    <div class="large-12 columns">
-		      <label>Link
-		        <?php print($form->text('link', $input->raw('link'))); ?>
-		      </label>
-		    </div>
-		</div>
-
-		<div class="row">
-		    <div class="large-12 columns">
-		      <label>Positie
-		        <?php print($form->text('position', $input->raw('position'))); ?>
-		      </label>
-		    </div>
-		</div>
-
-		<div class="row">
-			<div class="large-12 columns">
-				<button type="submit" role="button" aria-label="submit form" class="button">Bewerk</button>
-			</div>
-		</div>
-	</form>
+		<tbody>
+			<?php
+			foreach ($categories as $category):
+				$id = $category->retreive('id');
+			?>
+				<tr>
+					<td>
+						<a href="<?php print($url->route('CategoriesShowEdit', ['id' => $id])) ?>" class="button tiny">Bewerk</a>
+						<a href="<?php print($url->route('CategoriesShowDelete', ['id' => $id])) ?>" class="button tiny alert">Verwijder</a>
+					</td>
+					<td><?php print($category->retreive('name')); ?></td>
+					<td><?php print($category->retreive('main')); ?></td>
+				</tr>
+			<?php
+			endforeach;
+			?>
+		</tbody>
+	</table>
                 </div>
             </div>    
         </div>

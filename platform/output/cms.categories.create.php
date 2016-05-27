@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-	<title>Navigatie bewerken</title>	
+	<title>Nieuwe categorie</title>	
 	<meta charset="UTF-8">
 	    
         <link rel="stylesheet" href="/css/foundation.min.css" />
@@ -45,9 +45,9 @@
             </div>
             
             <div class="large-9 columns">    
-                <h2> Navigatie bewerken</h2>
+                <h2> Nieuwe categorie</h2>
                 <div class="content">
-                    <?php if (!isset($errors) || $errors != $__view->getInjectedVar("errors")){$errors=$__view->getInjectedVar("errors");}if (!isset($navigation) || $navigation != $__view->getInjectedVar("navigation")){$navigation=$__view->getInjectedVar("navigation");} ?>
+                    <?php if (!isset($parents) || $parents != $__view->getInjectedVar("parents")){$parents=$__view->getInjectedVar("parents");}if (!isset($errors) || $errors != $__view->getInjectedVar("errors")){$errors=$__view->getInjectedVar("errors");} ?>
 		    <?php
     if (isset($errors)):
     	print($this->service('htmlMessages')->errors($errors));
@@ -55,9 +55,8 @@
 
     $form = $this->service('form');
 	$input = $this->service('input');
-	$input->setModel($navigation);
 	?>
-	<form action="" method="post">
+	<form action="" method="post" enctype="multipart/form-data">
 		<div class="row">
 		    <div class="large-12 columns">
 		      <label>Naam
@@ -68,23 +67,23 @@
 
 		<div class="row">
 		    <div class="large-12 columns">
-		      <label>Link
-		        <?php print($form->text('link', $input->raw('link'))); ?>
+		      <label>Hoofdcategorie
+		        <?php print($form->select('parent', $parents, $input->raw('parent'))); ?>
 		      </label>
 		    </div>
 		</div>
 
 		<div class="row">
 		    <div class="large-12 columns">
-		      <label>Positie
-		        <?php print($form->text('position', $input->raw('position'))); ?>
+		      <label>Afbeelding
+		        <?php print($form->imageupload('image')); ?>
 		      </label>
 		    </div>
 		</div>
-
+		
 		<div class="row">
 			<div class="large-12 columns">
-				<button type="submit" role="button" aria-label="submit form" class="button">Bewerk</button>
+				<button type="submit" role="button" aria-label="submit form" class="button">Verstuur</button>
 			</div>
 		</div>
 	</form>

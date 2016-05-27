@@ -11,6 +11,10 @@
 </head>
 <body>
 <div id="main">
+    <?php
+    $messages = $this->service('htmlMessages');
+    $messages->errorClass('alert-box alert');
+    ?>
 	<?php if (!isset($userGuard) || $userGuard != $__view->getInjectedVar("userGuard")){$userGuard=$__view->getInjectedVar("userGuard");} ?>
         <div class="container row">        
         <div class="row">

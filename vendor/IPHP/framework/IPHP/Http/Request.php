@@ -9,11 +9,13 @@ class Request {
 
 	public function __construct () {
 		//setup the vars correctly
-		$this->baseUrl = dirname($_SERVER['SCRIPT_NAME']);
-		$this->currentUrl = urldecode($_SERVER['REQUEST_URI']);
+		$this->baseUrl 			= dirname($_SERVER['SCRIPT_NAME']);
+		$this->currentUrl 		= urldecode($_SERVER['REQUEST_URI']);
+		
 		if (strlen($this->baseUrl) > 1){
 			$this->currentUrl = str_replace($this->baseUrl, '', $this->currentUrl);
 		}
+
 		$currentUrlLength = strlen($this->currentUrl);
 		if ($currentUrlLength > 1 && $this->currentUrl[0] != "/"){
 			$this->currentUrl = '/' . $this->currentUrl;
@@ -59,6 +61,8 @@ class Request {
 			return $this->fromPost($name);
 		} else if ($this->fromGet($name) != NULL) {
 			return $this->fromGet($name);
+		} else if ($this->fromFiles($name) != NULL) {
+			return $this->fromFiles($name);
 		}
 
 		return NULL;
@@ -80,6 +84,14 @@ class Request {
 		return isset($_GET[$name]) ? $_GET[$name] : NULL;
 	}
 	/**
+	 * [fromFiles description]
+	 * @param  [type] $name [description]
+	 * @return [type]       [description]
+	 */
+	public function fromFiles ($name) {
+		return isset($_FILES[$name]) ? $_FILES[$name] : NULL;
+	}
+	/**
 	 * returns merged post, get, files
 	 * @return [type] [description]
 	 */
@@ -87,6 +99,7 @@ class Request {
 		if (empty($this->all)) {
 			$this->all = $_POST;
 			$this->all+= $_GET;
+			$this->all+= $_FILES;
 		}
 
 		return $this->all;

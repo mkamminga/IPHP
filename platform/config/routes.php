@@ -2,6 +2,18 @@
 use IPHP\Http\Routing\Route;
 use IPHP\Http\Routing\RouteCollection;
 
+function routeResource ($name, $class) {
+	return [
+		new Route($name . 'Overview', '/', 'get', $class, 'overview'),
+		new Route($name . 'ShowAdd', '/add', 'get', $class, 'showAdd'),
+		new Route($name . 'Post', '/add', 'post', $class, 'post'),
+		new Route($name . 'ShowEdit', '/edit/[num:id]', 'get', $class, 'showEdit'),
+		new Route($name . 'Put', '/edit/[num:id]', 'post', $class, 'put'),
+		new Route($name . 'ShowDelete', '/delete/[num:id]', 'get', $class, 'showDelete'),
+		new Route($name . 'Delete', '/delete/[num:id]', 'post', $class, 'delete')
+	];
+}
+
 return [
 	'settings' => [
 		'defaults' => [
@@ -34,18 +46,11 @@ return [
 
 				new Route('Dashboard', '/dashboard', 'get', App\Controllers\Backend\DashboardController::class, 'index'),
 				//navivation
-				new RouteCollection('/navigations', [], [
-					new Route('NavigationOverview', '/', 'get', App\Controllers\Backend\NavigationController::class, 'overview'),
-					new Route('NavigationShowAdd', '/add', 'get', App\Controllers\Backend\NavigationController::class, 'showAdd'),
-					new Route('NavigationPost', '/add', 'post', App\Controllers\Backend\NavigationController::class, 'post'),
-					new Route('NavigationShowEdit', '/edit/[num:id]', 'get', App\Controllers\Backend\NavigationController::class, 'showEdit'),
-					new Route('NavigationPut', '/edit/[num:id]', 'post', App\Controllers\Backend\NavigationController::class, 'put'),
-					new Route('NavigationShowDelete', '/delete/[num:id]', 'get', App\Controllers\Backend\NavigationController::class, 'showDelete'),
-					new Route('NavigationDelete', '/delete/[num:id]', 'post', App\Controllers\Backend\NavigationController::class, 'delete')
-				]),
-				//categories
-				new RouteCollection('/categories', [], [
-				])
+				new RouteCollection('/navigations', [], routeResource('Navigation', App\Controllers\Backend\NavigationController::class)),
+				//Categories
+				new RouteCollection('/categories', [], routeResource('Categories', App\Controllers\Backend\CategoriesController::class)),
+				//Products
+				new RouteCollection('/categories', [], routeResource('Products', App\Controllers\Backend\ProductsController::class)),
 			])
 		])
 	]

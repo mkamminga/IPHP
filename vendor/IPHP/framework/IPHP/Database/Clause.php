@@ -51,11 +51,15 @@ class Clause extends Queriable {
 	}
 
 	public function isNull ($field, $andOr = 'AND') {
-		return $this->append($field, 'IS NULL', $andOr);
+		$this->append($andOr, $field . ' IS NULL');
+
+		return $this;
 	}
 
 	public function notIsNull ($field, $andOr = 'AND') {
-		return $this->append($field, 'IS NOT NULL', $andOr);
+		$this->append($andOr, $field . ' IS NOT NULL');
+		
+		return $this;
 	}
 
 	public function equals ($field, $value, $andOr = 'AND') {

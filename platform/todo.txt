@@ -6,6 +6,7 @@
 	- orders
 	- navigation
 -frontend
+	- menu categories (subcategories)
 	- categories
 	- registration
 	- product item

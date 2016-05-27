@@ -85,13 +85,25 @@ class NavigationController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id)
+    public function showDelete(int $id)
     {
-        if (($category = Categorie::find($id))) {
-            $category->delete();
-        }
+        $navigation = $this->getNavigationOrFail($id);
 
-        return redirect()->route('beheer.categories.index');
+        return $this->view('cms::default.delete.php', ['name' => $navigation->retreive('name')]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function delete($id)
+    {
+        $navigation = $this->getNavigationOrFail($id);
+        $navigation->delete();
+
+        $this->redirect()->toRoute('NavigationOverview');
     }
 
     private function getNavigationOrFail (int $id) :Navigation {

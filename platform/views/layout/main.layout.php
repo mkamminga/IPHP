@@ -14,6 +14,10 @@
 </head>
 <body>
 <div id="main">
+    <?php
+    $messages = $this->service('htmlMessages');
+    $messages->errorClass('alert-box alert');
+    ?>
 	<< show('content', '')
 	<< show('scripts', '')
 </div>

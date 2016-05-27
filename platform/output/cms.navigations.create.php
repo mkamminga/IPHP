@@ -11,6 +11,10 @@
 </head>
 <body>
 <div id="main">
+    <?php
+    $messages = $this->service('htmlMessages');
+    $messages->errorClass('alert-box alert');
+    ?>
 	<?php if (!isset($userGuard) || $userGuard != $__view->getInjectedVar("userGuard")){$userGuard=$__view->getInjectedVar("userGuard");} ?>
         <div class="container row">        
         <div class="row">
@@ -34,7 +38,7 @@
                         <li><a href="<?php print($url->route('NavigationOverview')); ?>">Navigatie</a></li>
                         <li><a href="{{ URL::route('beheer.orders.index') }}">Orders</a></li>
                         <li><a href="{{ URL::route('beheer.products.index') }}">Products</a></li>
-                        <li><a href="{{ URL::route('beheer.categories.index') }}">Categories</a></li>
+                        <li><a href="<?php print($url->route('CategoriesOverview')); ?>">Categories</a></li>
                         <li><a href="{{ URL::route('beheer.users.index') }}">Gebruikers</a></li>
                     </ul>
                 </div> 
@@ -45,31 +49,18 @@
                 <div class="content">
                     <?php if (!isset($errors) || $errors != $__view->getInjectedVar("errors")){$errors=$__view->getInjectedVar("errors");} ?>
 	    <?php
-    if (isset($errors) && count((array)$errors) > 0):
-    ?>
-        <div data-alert="" class="alert-box alert">
-            <ul>
-                <?php
-                foreach ($errors as $error):
-                ?>
-                    <li><?php print($error); ?></li>
-                <?php
-                endforeach;
-                ?>
-            </ul>
-            
-        </div>
-    <?php
+    if (isset($errors)):
+    	print($this->service('htmlMessages')->errors($errors));
     endif;
-    ?>
-	<?php
+
+    $form = $this->service('form');
 	$input = $this->service('input');
 	?>
 	<form action="" method="post">
 		<div class="row">
 		    <div class="large-12 columns">
 		      <label>Naam
-		        <input type="text" name="name" value="<?php print($input->raw('name')) ?>">
+		        <?php print($form->text('name', $input->raw('name'))); ?>
 		      </label>
 		    </div>
 		</div>
@@ -77,7 +68,7 @@
 		<div class="row">
 		    <div class="large-12 columns">
 		      <label>Link
-		        <input type="text" name="link" value="<?php print($input->raw('link')) ?>">
+		        <?php print($form->text('link', $input->raw('link'))); ?>
 		      </label>
 		    </div>
 		</div>
@@ -85,7 +76,7 @@
 		<div class="row">
 		    <div class="large-12 columns">
 		      <label>Positie
-		        <input type="text" name="position" value="<?php print($input->raw('position')) ?>">
+		        <?php print($form->text('position', $input->raw('position'))); ?>
 		      </label>
 		    </div>
 		</div>

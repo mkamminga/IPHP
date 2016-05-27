@@ -1,26 +1,29 @@
 <?php
 
-namespace App\Http\Controllers\Cms;
+namespace App\Controllers\Backend;
 
-use Illuminate\Http\Request;
+use IPHP\Http\Request;
+use IPHP\Validation\Validator;
+use IPHP\Validation\Rule;
 
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
-use App\Http\Models\Categorie;
-use Validator;
+use IPHP\File\File;
 
-class Categories extends Controller
+use App\Controllers\Controller;
+use App\Category;
+
+class CategoriesController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return Response
      */
-    public function index()
+    public function overview()
     {
-        $categories = Categorie::all();
+        $category = new Category;
+        $categories = $category->get($category->byName( $category->allWithParent() ) );
 
-        return view('cms.categories.overview', ['categories' => $categories]);
+        return $this->view('cms::categories::overview.php', ['categories' => $categories]);
     }
 
     /**
@@ -28,9 +31,9 @@ class Categories extends Controller
      *
      * @return Response
      */
-    public function create()
+    public function showAdd()
     {
-        return view('cms.categories.create');
+        return $this->view('cms::categories::create.php', ['parents' => $this->parents()]);
     }
 
     /**
@@ -38,27 +41,14 @@ class Categories extends Controller
      *
      * @return Response
      */
-    public function store(Request $request)
+    public function post(Request $request, Validator $validator, File $file)
     {
-        $requestData = $request->all();
-        $validator = $this->validator($requestData);
-
-
-        if (!$validator->fails()) {
-            $categorie = new Categorie();
-            $categorie->name = $requestData['name'];
-
-            if ($categorie->save()){
-                return redirect()->route('beheer.categories.index');
-            } else {
-                $validator->errors()->add('main', 'Er is een onbekende fout opgetreden tijdens het opslaan!');
-            }
-
+        $category = new Category;
+        if (!$this->save($category, $request, $validator, $file)) {
+            return $this->showAdd()->setVar('errors', $validator->getErrors());
+        } else {
+            return $this->redirect()->toRoute('CategoriesOverview');
         }
-
-        return redirect()->route('beheer.categories.create')
-                ->withErrors($validator)
-                ->withInput();
     }
 
     /**
@@ -80,7 +70,7 @@ class Categories extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function edit($id)
+    public function showEdit($id)
     {
         $category = Categorie::find($id);
 
@@ -98,7 +88,7 @@ class Categories extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function update($id, Request $request)
+    public function put($id, Request $request)
     {
         $requestData = $request->all();
         $validator = $this->validator($requestData);
@@ -140,9 +130,37 @@ class Categories extends Controller
         return redirect()->route('beheer.categories.index');
     }
 
-    private function validator ($requestData) {
-        return Validator::make($requestData, [
-            'name' => 'required|max:20',
+    private function parents () {
+        $category = new Category;
+
+        $categories = $category->get($category->byName($category->allParent()));
+
+        $parents = [];
+        foreach ($categories as $parent) {
+            $parents[$parent->retreive('id')] = $parent->retreive('name');
+        }
+
+        return $parents;
+    }
+
+    private function save (Category $category, Request $request, Validator $validator, File $file, $update = false) {
+        $validator->addRules([
+            new Rule('name', 'Naam', ['required', 'min:size=2', 'max:size=20']),
+            new Rule('image', 'Afbeelding', ['required', 'mime:prefix=image|types=jpg,jpeg,png,gif'])
         ]);
+
+        if ($validator->validate($request->all())) {
+            exit;
+            $categorie->name = $requestData['name'];
+
+            if (!$categorie->save()){
+                $validator->errors()->add('main', 'Er is een onbekende fout opgetreden tijdens het opslaan!');
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }

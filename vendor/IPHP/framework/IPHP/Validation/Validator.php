@@ -15,6 +15,7 @@ class Validator {
 		'email' 	=> 'validateEmail',
 		'min' 		=> 'validateMinSize',
 		'max' 		=> 'validateMaxSize',
+		'mime'		=> 'validateMimeType'
 	];
 
 	public function __construct (Translator $translator) {
@@ -97,7 +98,16 @@ class Validator {
 	}
 
 	private function validateRequired ($data):bool {
-		return !empty($data);
+		if (is_array($data) 
+			&& isset($data['tmp_name']) 
+			&& isset($data['name'])
+			&& isset($data['error'])
+			&& isset($data['type'])
+			&& isset($data['size']))  {
+			return $data['error'] == UPLOAD_ERR_OK;
+		} else {
+			return !empty($data);
+		}
 	}
 
 	private function validateEmail ($email):bool {
@@ -120,5 +130,47 @@ class Validator {
 
 	private function validateMaxSize ($data, array $bounds): bool{
 		return (isset($bounds['size']) && strlen($data) < (int)$bounds['size']);
+	}
+
+	private function validateMimeType ($data, array $bounds):bool {
+		if (!is_array($data)) {
+			return false;
+		}
+
+		$types = [];
+		
+		if (!isset($bounds['types']) || !isset($bounds['prefix'])) {
+			throw new \Exception("Type of prefix not set");
+		}
+
+		$types = explode(',', $bounds['types']);
+		foreach ($types as &$type) {
+			$type = $bounds['prefix'] . '/' . $type;
+		}
+		//First mime type check of the uploaded file
+		//least secure, but most simple and quick check
+		if (!isset($data['type']) || !in_array($data['type'], $types)) {
+			return false;
+		}
+
+		$finfo = finfo_open(FILEINFO_MIME);
+
+		if (!$finfo) {
+			throw new \Exception("Failed opening file info!");
+		}
+
+		$file = finfo_file($finfo, $data['tmp_name']);
+		$matches = [];
+		//couldn't extract mime\type
+		if (!preg_match('/^([a-z0-9_]+\/[a-z0-9_]+)(?=\;)/', $file, $matches)){
+			return false;
+		}
+		//receck mime type, more secure than the first mime check which relies on the defined mimetype
+		//this check compares the extrated mimetype from the reading the file, againt allowed mimetypes
+		if (!in_array($matches[0], $types)) {
+			return false;
+		}
+
+		return true;
 	}
 }

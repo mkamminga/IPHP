@@ -3,7 +3,11 @@
  * Providers
  */
 return [
-	'url' => \IPHP\App\Helpers\Url::class,
-	'redirect' => \IPHP\App\Helpers\Redirect::class,
-	'input' => \IPHP\App\Helpers\Input::class
+	//Helpers
+	'url' => \IPHP\Helpers\Url::class,
+	'redirect' => \IPHP\Helpers\Redirect::class,
+	'input' => \IPHP\Helpers\Input::class,
+	//View helpers
+	'htmlMessages' => \IPHP\Helpers\View\Messages::class,
+	'form' => \IPHP\Helpers\View\Form::class
 ];

@@ -1,29 +1,16 @@
 >> parent('cms::layout::backend.php')
 
->> section('title', 'Nieuwe navigatie')
+>> section('title', 'Navigatie bewerken')
 
 >> section('fcontent')
 	>> uses errors
 	>> uses navigation
     <?php
-    if (isset($errors) && count((array)$errors) > 0):
-    ?>
-        <div data-alert="" class="alert-box alert">
-            <ul>
-                <?php
-                foreach ($errors as $error):
-                ?>
-                    <li><?php print($error); ?></li>
-                <?php
-                endforeach;
-                ?>
-            </ul>
-            
-        </div>
-    <?php
+    if (isset($errors)):
+    	print($this->service('htmlMessages')->errors($errors));
     endif;
-    ?>
-	<?php
+
+    $form = $this->service('form');
 	$input = $this->service('input');
 	$input->setModel($navigation);
 	?>
@@ -31,7 +18,7 @@
 		<div class="row">
 		    <div class="large-12 columns">
 		      <label>Naam
-		        <input type="text" name="name" value="<?php print($input->raw('name')) ?>">
+		        <?php print($form->text('name', $input->raw('name'))); ?>
 		      </label>
 		    </div>
 		</div>
@@ -39,7 +26,7 @@
 		<div class="row">
 		    <div class="large-12 columns">
 		      <label>Link
-		        <input type="text" name="link" value="<?php print($input->raw('link')) ?>">
+		        <?php print($form->text('link', $input->raw('link'))); ?>
 		      </label>
 		    </div>
 		</div>
@@ -47,7 +34,7 @@
 		<div class="row">
 		    <div class="large-12 columns">
 		      <label>Positie
-		        <input type="text" name="position" value="<?php print($input->raw('position')) ?>">
+		        <?php print($form->text('position', $input->raw('position'))); ?>
 		      </label>
 		    </div>
 		</div>

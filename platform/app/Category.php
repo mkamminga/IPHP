@@ -8,6 +8,7 @@ use IPHP\Database\Where;
 class Category extends Model {
 	protected $table = 'categories';
 	protected $primaryKeys = ['id'];
+	protected $softDelete = true;
 
 	public function all () {
 		return $this->select();

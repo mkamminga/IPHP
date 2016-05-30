@@ -5,13 +5,20 @@ class Request {
 	protected $currentUrl = NULL;
 	protected $baseUrl = NULL;
 	protected $all = [];
+	protected $post = [];
+	protected $get = [];
+	protected $files = [];
 
 
 	public function __construct () {
+		$this->initUrls();
+		$this->initInputs();
+	}
+
+	private function initUrls () {
 		//setup the vars correctly
 		$this->baseUrl 			= dirname($_SERVER['SCRIPT_NAME']);
 		$this->currentUrl 		= urldecode($_SERVER['REQUEST_URI']);
-		
 		if (strlen($this->baseUrl) > 1){
 			$this->currentUrl = str_replace($this->baseUrl, '', $this->currentUrl);
 		}
@@ -22,6 +29,23 @@ class Request {
 		} else if ($currentUrlLength == 1 &&  $this->currentUrl[0] == '/') {
 			$this->currentUrl = '';
 		}
+	}
+
+	private function initInputs () {
+		
+
+		$createInputs = function ($data, $class, $from) {
+			$return = [];
+			foreach ($data as $key => $value) {
+				$return[$key] = new $class($key, $value, $from);
+			}
+
+			return $return;
+		};
+
+		$this->post 	= $createInputs($_POST, RequestInput::class, 'post');
+		$this->get 		= $createInputs($_GET, RequestInput::class, 'get');
+		$this->files 	= $createInputs($_FILES, RequestUploadedFile::class, 'file');
 	}
 	/**
 	 * [getMethod description]
@@ -73,7 +97,7 @@ class Request {
 	 * @return [type]       [description]
 	 */
 	public function fromPost ($name) {
-		return isset($_POST[$name]) ? $_POST[$name] : NULL;
+		return isset($this->post[$name]) ? $this->post[$name] : NULL;
 	}
 	/**
 	 * [fromGet description]
@@ -81,7 +105,7 @@ class Request {
 	 * @return [type]       [description]
 	 */
 	public function fromGet ($name) {
-		return isset($_GET[$name]) ? $_GET[$name] : NULL;
+		return isset($this->get[$name]) ? $this->get[$name] : NULL;
 	}
 	/**
 	 * [fromFiles description]
@@ -89,7 +113,7 @@ class Request {
 	 * @return [type]       [description]
 	 */
 	public function fromFiles ($name) {
-		return isset($_FILES[$name]) ? $_FILES[$name] : NULL;
+		return isset($this->files[$name]) ? $this->files[$name] : NULL;
 	}
 	/**
 	 * returns merged post, get, files
@@ -97,9 +121,9 @@ class Request {
 	 */
 	public function all () {
 		if (empty($this->all)) {
-			$this->all = $_POST;
-			$this->all+= $_GET;
-			$this->all+= $_FILES;
+			$this->all+= $this->get;
+			$this->all+= $this->post;
+			$this->all+= $this->files;
 		}
 
 		return $this->all;

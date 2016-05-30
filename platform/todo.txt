@@ -1,10 +1,14 @@
 - backoffice 
-	- login
-		- auth filter: role=admin
 	- categories
+		- fileupload
+			-(size)
 	- products (subcategory)
+		- subcategory
+		- fileupload
+			- size check?
 	- orders
 	- navigation
+	- logout
 -frontend
 	- menu categories (subcategories)
 	- categories

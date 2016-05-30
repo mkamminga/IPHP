@@ -11,6 +11,10 @@
 </head>
 <body>
 <div id="main">
+    <?php
+    $messages = $this->service('htmlMessages');
+    $messages->errorClass('alert-box alert');
+    ?>
 	<?php if (!isset($errors) || $errors != $__view->getInjectedVar("errors")){$errors=$__view->getInjectedVar("errors");} ?>
     <div class="row">
     <div class="large-12 columns">

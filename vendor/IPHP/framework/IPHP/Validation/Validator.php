@@ -2,6 +2,8 @@
 namespace IPHP\Validation;
 
 use IPHP\Translation\Translator;
+use IPHP\Http\RequestInput;
+use IPHP\Http\RequestUploadedFile;
 
 class Validator {
 	private $translator;
@@ -9,13 +11,17 @@ class Validator {
 	private $errors = [];
 	private $rules = [];
 	protected $requirementToMethodMap = [
-		'required' 	=> 'validateRequired',
-		'alpha_num' => 'validateAlphaNum',
-		'num'		=> 'validateNum',
-		'email' 	=> 'validateEmail',
-		'min' 		=> 'validateMinSize',
-		'max' 		=> 'validateMaxSize',
-		'mime'		=> 'validateMimeType'
+		'required' 		=> 'validateRequired',
+		'alpha_num' 	=> 'validateAlphaNum',
+		'num'			=> 'validateNum',
+		'email' 		=> 'validateEmail',
+		'min' 			=> 'validateMinSize',
+		'max' 			=> 'validateMaxSize',
+		'mime'			=> 'validateMimeType',
+	];
+
+	protected $nonEscapeable = [
+		'required',
 	];
 
 	public function __construct (Translator $translator) {
@@ -33,7 +39,8 @@ class Validator {
 			$inputName 	= $rule->getInputname();
 			$methods 	= $rule->getRequirements();
 			$value 		= isset($data[$inputName]) ? $data[$inputName] : NULL;
-
+			$valueSet 	= $value != NULL && !$value->isNull();
+			
 			foreach ($methods as $method) {
 				$bounds = [];
 				$methodFromRule = '';
@@ -43,6 +50,11 @@ class Validator {
 				if (isset($this->requirementToMethodMap[$methodFromRule]) && method_exists($this, $this->requirementToMethodMap[$methodFromRule])) {
 
 					$realMethod = $this->requirementToMethodMap[$methodFromRule];
+					if (!$valueSet && !in_array($methodFromRule, $this->nonEscapeable)) {
+						continue;
+					}
+				
+
 					if (!$this->{$realMethod}($value, $bounds)) {
 						$this->errors[$inputName] = $this->parseMessage($methodFromRule, $rule->getFieldname(), $bounds);	
 
@@ -97,45 +109,36 @@ class Validator {
 		$this->errors[$key] = $error;
 	}
 
-	private function validateRequired ($data):bool {
-		if (is_array($data) 
-			&& isset($data['tmp_name']) 
-			&& isset($data['name'])
-			&& isset($data['error'])
-			&& isset($data['type'])
-			&& isset($data['size']))  {
-			return $data['error'] == UPLOAD_ERR_OK;
-		} else {
-			return !empty($data);
-		}
+	private function validateRequired (RequestInput $data):bool {
+		return !$data->isEmpty();
 	}
 
-	private function validateEmail ($email):bool {
+	private function validateEmail (RequestInput $email):bool {
 		//
 		//
 		return false;
 	}
 
-	private function validateAlphaNum ($data):bool {
-		return preg_match('/^[a-zA-Z0-9_\.\@]+$/', $data);
+	private function validateAlphaNum (RequestInput $data):bool {
+		return preg_match('/^[a-zA-Z0-9_\.\@]+$/', $data->getValue());
 	}
 
-	private function validateNum ($data):bool {
-		return preg_match('/^[0-9]+$/', $data);
+	private function validateNum (RequestInput $data):bool {
+		return preg_match('/^[0-9]+$/', $data->getValue());
 	}
 
-	private function validateMinSize ($data, array $bounds): bool{
-		return (isset($bounds['size']) && strlen($data) >  (int)$bounds['size']);
+	private function validateMinSize (RequestInput $input, array $bounds): bool{
+		$data = $input->getValue();
+		return (isset($bounds['size']) && strlen($data) >=  (int)$bounds['size']);
 	}
 
-	private function validateMaxSize ($data, array $bounds): bool{
-		return (isset($bounds['size']) && strlen($data) < (int)$bounds['size']);
+	private function validateMaxSize (RequestInput $input, array $bounds): bool{
+		$data = $input->getValue();
+		return (isset($bounds['size']) && strlen($data) <= (int)$bounds['size']);
 	}
 
-	private function validateMimeType ($data, array $bounds):bool {
-		if (!is_array($data)) {
-			return false;
-		}
+	private function validateMimeType (RequestUploadedFile $file, array $bounds):bool {
+		$data = $file->getValue();
 
 		$types = [];
 		

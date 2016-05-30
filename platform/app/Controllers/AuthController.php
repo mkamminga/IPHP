@@ -25,10 +25,10 @@ class AuthController extends Controller {
 		]);
 
 		if ($validator->validate($request->all())) {
-			$user = $user->findByName($request->get('username'));
+			$user = $user->findByName($request->get('username')->getValue());
 
-			if ($user && password_verify($request->get('password'), $user->retreive('password'))) {
-				$password = password_hash($request->get('password'), PASSWORD_BCRYPT, ['cost' => 11]);
+			if ($user && password_verify($request->get('password')->getValue(), $user->retreive('password'))) {
+				$password = password_hash($request->get('password')->getValue(), PASSWORD_BCRYPT, ['cost' => 11]);
 				//update salt
 				$user->set('password', $password);
 				$user->save();

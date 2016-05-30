@@ -128,9 +128,9 @@ class NavigationController extends Controller
 
         if ($validator->validate($requestData)) {
 
-            $navigation->set('name', $requestData['name']);
-            $navigation->set('link', $requestData['link']);
-            $navigation->set('position', $requestData['position']);
+            $navigation->set('name', $requestData['name']->getValue());
+            $navigation->set('link', $requestData['link']->getValue());
+            $navigation->set('position', $requestData['position']->getValue());
 
             if (!$navigation->save()){
                 $validator->addError('main', 'Er is een onbekende fout opgetreden tijdens het opslaan!');

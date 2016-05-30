@@ -11,6 +11,10 @@
 </head>
 <body>
 <div id="main">
+    <?php
+    $messages = $this->service('htmlMessages');
+    $messages->errorClass('alert-box alert');
+    ?>
 	<?php if (!isset($userGuard) || $userGuard != $__view->getInjectedVar("userGuard")){$userGuard=$__view->getInjectedVar("userGuard");} ?>
         <div class="container row">        
         <div class="row">
@@ -34,7 +38,7 @@
                         <li><a href="<?php print($url->route('NavigationOverview')); ?>">Navigatie</a></li>
                         <li><a href="{{ URL::route('beheer.orders.index') }}">Orders</a></li>
                         <li><a href="{{ URL::route('beheer.products.index') }}">Products</a></li>
-                        <li><a href="{{ URL::route('beheer.categories.index') }}">Categories</a></li>
+                        <li><a href="<?php print($url->route('CategoriesOverview')); ?>">Categories</a></li>
                         <li><a href="{{ URL::route('beheer.users.index') }}">Gebruikers</a></li>
                     </ul>
                 </div> 

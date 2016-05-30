@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-	<title>Bevestiging verwijdering</title>	
+	<title>Nieuwe categorie</title>	
 	<meta charset="UTF-8">
 	    
         <link rel="stylesheet" href="/css/foundation.min.css" />
@@ -45,13 +45,51 @@
             </div>
             
             <div class="large-9 columns">    
-                <h2> Bevestiging verwijdering</h2>
+                <h2> Nieuwe categorie</h2>
                 <div class="content">
-                    <?php if (!isset($name) || $name != $__view->getInjectedVar("name")){$name=$__view->getInjectedVar("name");} ?>
-	<p>Wilt u '<?php print($name); ?>' permanent verwijderen?</p>
-<form action="" method="post">
-	<button name="confirm" type="submit" value="true">Bevestig</button>
-</form>
+                    <?php if (!isset($parents) || $parents != $__view->getInjectedVar("parents")){$parents=$__view->getInjectedVar("parents");}if (!isset($category) || $category != $__view->getInjectedVar("category")){$category=$__view->getInjectedVar("category");}if (!isset($errors) || $errors != $__view->getInjectedVar("errors")){$errors=$__view->getInjectedVar("errors");} ?>
+			    <?php
+    if (isset($errors)):
+    	print($this->service('htmlMessages')->errors($errors));
+    endif;
+
+    $form = $this->service('form');
+	$input = $this->service('input');
+	$input->setModel($category);
+	?>
+	<form action="" method="post" enctype="multipart/form-data">
+		<div class="row">
+		    <div class="large-12 columns">
+		      <label>Naam
+		        <?php print($form->text('name', $input->raw('name'))); ?>
+		      </label>
+		    </div>
+		</div>
+
+		<div class="row">
+		    <div class="large-12 columns">
+		      <label>Hoofdcategorie
+		        <?php print($form->select('Parent_id', $parents, $input->raw('Parent_id'))); ?>
+		      </label>
+		    </div>
+		</div>
+
+		<div class="row">
+		    <div class="large-12 columns">
+		      <label>Afbeelding
+		        <?php print($form->imageupload('image')); ?>
+		      </label>
+
+		      <a href="<?php print(categories_images_dir . DIRECTORY_SEPARATOR . $category->retreive('id') . DIRECTORY_SEPARATOR . $category->retreive('thumb')) ?>">Bekijk</a>
+		    </div>
+		</div>
+		
+		<div class="row">
+			<div class="large-12 columns">
+				<button type="submit" role="button" aria-label="submit form" class="button">Verstuur</button>
+			</div>
+		</div>
+	</form>
                 </div>
             </div>    
         </div>

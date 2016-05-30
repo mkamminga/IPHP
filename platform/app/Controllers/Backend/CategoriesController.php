@@ -7,6 +7,7 @@ use IPHP\Validation\Validator;
 use IPHP\Validation\Rule;
 
 use IPHP\File\File;
+use IPHP\File\UploadedFile;
 
 use App\Controllers\Controller;
 use App\Category;
@@ -41,29 +42,24 @@ class CategoriesController extends Controller
      *
      * @return Response
      */
-    public function post(Request $request, Validator $validator, File $file)
+    public function post(Request $request, Validator $validator)
     {
         $category = new Category;
-        if (!$this->save($category, $request, $validator, $file)) {
-            return $this->showAdd()->setVar('errors', $validator->getErrors());
-        } else {
-            return $this->redirect()->toRoute('CategoriesOverview');
-        }
+        if ($this->save($category, $request, $validator)) {
+            if ($this->saveImage($category, $request)) {
+                $this->redirect()->toRoute('CategoriesOverview');
+            } else {
+                //onfailure to create a dir in which to save the newly created category, reverse the creation
+                $file = new File;
+                $file->removeDir($this->getSavePath($category));
+                $category->delete();
+
+                $validator->addError('main', 'Kon afbeelding niet opslaan!');
+            }
+        } 
+
+        return $this->showAdd()->setVar('errors', $validator->getErrors());
     }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function show($id)
-    {
-        $category = Categorie::find($id);
-
-        return view('cms.categories.delete', ['category' => $category]);
-    }
-
     /**
      * Show the form for editing the specified resource.
      *
@@ -72,14 +68,13 @@ class CategoriesController extends Controller
      */
     public function showEdit($id)
     {
-        $category = Categorie::find($id);
+        $category = $this->getCategoryOrFail($id);
 
-        if (!$category){
-            throw new Exception("Category not foundx!");
+        $parents = $this->parents();
+        if (isset($parents[$id])) {
+            unset($parents[$id]);
         }
-
-
-        return view('cms.categories.edit', ['category' => $category]);
+        return $this->view('cms::categories::edit.php', ['category' => $category, 'parents' => $parents]);
     }
 
     /**
@@ -88,31 +83,32 @@ class CategoriesController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function put($id, Request $request)
+    public function put($id, Request $request, Validator $validator)
     {
-        $requestData = $request->all();
-        $validator = $this->validator($requestData);
+        $category = $this->getCategoryOrFail($id);
+        $oldFile = $category->retreive('thumb');
 
+        if ($this->save($category, $request, $validator, true)) {
+            if ($oldFile != $category->retreive('thumb')) {
+                if ($this->saveImage($category, $request)){
+                    $file = new File;
+                    $file->remove($this->getSavePath($category) . DIRECTORY_SEPARATOR . $oldFile);
 
-        if (!$validator->fails()) {
-            $categorie = Categorie::find($id);
-            if (!$categorie) {
-                throw new Exception("Category not found!");
-            } 
-
-            $categorie->name = $requestData['name'];
-
-            if ($categorie->save()){
-                return redirect()->route('beheer.categories.index');
+                    $this->redirect()->toRoute('CategoriesOverview');
+                } else {
+                    $category->set('thumb', $oldFile);
+                }
             } else {
-                $validator->errors()->add('main', 'Er is een onbekende fout opgetreden tijdens het opslaan!');
+                $this->redirect()->toRoute('CategoriesOverview');
             }
-
+        } 
+        //something must have gone wrong, show the edit view again with the errors
+        $parents = $this->parents();
+        if (isset($parents[$id])) {
+            unset($parents[$id]);
         }
 
-        return redirect()->route('beheer.categories.edit', ['id' => $id])
-                ->withErrors($validator)
-                ->withInput();
+        return $this->view('cms::categories::edit.php', ['category' => $category, 'parents' => $parents, 'errors' => $validator->getErrors()]);
     }
 
     /**
@@ -121,13 +117,37 @@ class CategoriesController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id)
+    public function showDelete($id)
     {
-        if (($category = Categorie::find($id))) {
-            $category->delete();
+        $category = $this->getCategoryOrFail($id);
+        return $this->view('cms::default.delete.php', ['name' => $category->retreive('name')]);
+    }
+
+    public function delete (int $id) {
+        $category = $this->getCategoryOrFail($id);
+
+        $file = new File;
+        $path = $this->getSavePath($category);
+        if ($file->exists($path)){
+            $file->removeDir($path);
         }
 
-        return redirect()->route('beheer.categories.index');
+        if ($category->softDelete()){
+            $this->redirect()->toRoute('CategoriesOverview');
+        } else {
+            throw new Exception("Kon categorie niet verwijderen");
+        }
+    }
+
+    private function getCategoryOrFail (int $id) {
+        $category = new Category;
+        $category = $category->find($id);
+
+        if (!$category) {
+            throw new \Exception("Couldn't find category");
+        }
+
+        return $category;
     }
 
     private function parents () {
@@ -143,24 +163,58 @@ class CategoriesController extends Controller
         return $parents;
     }
 
-    private function save (Category $category, Request $request, Validator $validator, File $file, $update = false) {
+    private function save (Category $category, Request $request, Validator $validator, $update = false) {
+        $fileRequirements = ['mime:prefix=image|types=jpg,jpeg,png,gif'];
+
+        if (!$update) {
+            array_unshift($fileRequirements, 'required');
+        }
+
         $validator->addRules([
             new Rule('name', 'Naam', ['required', 'min:size=2', 'max:size=20']),
-            new Rule('image', 'Afbeelding', ['required', 'mime:prefix=image|types=jpg,jpeg,png,gif'])
+            new Rule('image', 'Afbeelding', $fileRequirements)
         ]);
+        $requestData = $request->all();
 
-        if ($validator->validate($request->all())) {
-            exit;
-            $categorie->name = $requestData['name'];
-
-            if (!$categorie->save()){
+        if ($validator->validate($requestData)) {
+            $category->set('name', $requestData['name']->getValue());
+            if (isset($requestData['Parent_id'])){
+                $category->set('Parent_id', $requestData['Parent_id']->getValue());
+            }
+            if (!$requestData['image']->isNull()){
+                $file = new File;
+                $category->set('thumb', $file->normilizeName($requestData['image']->realName()));
+            }
+            //on failure to save return false
+            if (!$category->save()){
                 $validator->errors()->add('main', 'Er is een onbekende fout opgetreden tijdens het opslaan!');
                 return false;
-            }
-
+            } 
+           
             return true;
         }
 
         return false;
+    }
+
+    private function saveImage (Category $category, Request $request) {
+        $file = new File;
+        $uploadedFile = new UploadedFile($request->fromFiles('image')->getValue());
+        $dir = $this->getSavePath($category);
+        //throws exception onfailure
+        try {
+            $file->createDir($dir);
+            if (!$uploadedFile->move($dir, $category->retreive('thumb'))){
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function getSavePath (Category $category) {
+        return public_path . DIRECTORY_SEPARATOR . categories_images_dir . DIRECTORY_SEPARATOR . $category->retreive('id');
     }
 }

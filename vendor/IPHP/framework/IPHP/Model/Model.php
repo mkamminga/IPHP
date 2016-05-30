@@ -17,6 +17,7 @@ class Model {
 	protected $updatedFields = [];
 	protected $onSave = 'insert';
 	protected $related = [];
+	protected $softDelete = false;
 
 	public static function setDefaultConnection (DB $db) {
 		self::$defaultConnection = $db;
@@ -41,7 +42,13 @@ class Model {
 	 * @return 
 	 */
 	public function select(...$fields) {
-		return (new Selectable($this->table))->select($fields);
+		$select = (new Selectable($this->table))->select($fields);
+		
+		if ($this->softDelete) {
+			$select->where((new Where)->isNull('`'. $this->table .'`.`deleted_at`'));
+		}
+
+		return $select;
 	}
 	/**
 	 * Set the queryiable to find with an id set
@@ -126,6 +133,23 @@ class Model {
 			$related->injectIntoCollection($collection);
 		}
 	}
+	/**
+	 * Returns the clause needed to update or delete
+	 * @return [type] [description]
+	 */
+	private function getUpdateableClause () {
+		$where = new Where;
+		foreach ($this->primaryKeys as $key) {
+			$value = $this->retreive($key);
+			if ($value){
+				$where->equals($key, $this->retreive($key));
+			} else {
+				throw new \Exception("Primary key (". $key .") has no value!");
+			}
+		}
+
+		return $where;
+	}
 
 	public function save () {
 		$sql = NULL;
@@ -154,17 +178,9 @@ class Model {
 			$sql->fields($keyValue);
 
 			if (!empty($this->primaryKeys)) {
-				$where = new Where;
-				foreach ($this->primaryKeys as $key) {
-					$value = $this->retreive($key);
-					if ($value){
-						$where->equals($key, $this->retreive($key));
-					} else {
-						throw new \Exception("Primary key (". $key .") has no value!");
-					}
-				}
+				
 
-				$sql->where($where);
+				$sql->where($this->getUpdateableClause());
 				$executeabelSql 	= $sql->getComputedQuery();
 				$values 			= $sql->getValues();
 			} else {
@@ -189,18 +205,7 @@ class Model {
 
 	public function delete () {
 		$delete = new Delete($this->table);
-
-		$where = new Where();
-
-		foreach ($this->primaryKeys as $key) {
-			$value = $this->retreive($key);
-			if ($value === NULL) {
-				throw new \Exception("Value not set for primary key: '". $key . "'");
-			}
-			$where->equals($key, $this->retreive($key));
-		}
-
-		$delete->where($where);
+		$delete->where($this->getUpdateableClause());
 
 		$sql 		= $delete->getComputedQuery();
 		$values 	= $delete->getValues();
@@ -214,11 +219,19 @@ class Model {
 		return true;
 	}
 
-	public function set ($key, $value) {
-		$this->fields->{$key} = $value;
+	public function softDelete () {
+		$this->set('deleted_at', date('Y-m-d h:i:s'));
 
-		if ($this->onSave == 'update' && !in_array($key, $this->updatedFields)) {
-			$this->updatedFields[] = $key;
+		return $this->save();
+	}
+
+	public function set ($key, $value) {
+		if ($this->retreive($key) != $value) {
+			$this->fields->{$key} = $value;
+
+			if ($this->onSave == 'update' && !in_array($key, $this->updatedFields)) {
+				$this->updatedFields[] = $key;
+			}
 		}
 	}
 

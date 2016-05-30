@@ -75,8 +75,13 @@ class Input {
     private function retreive ($name) {
     	if ($this->model != NULL && !in_array($this->request->getMethod(), ['post', 'put', 'delete'])) {
     		return $this->model->retreive($name);
-    	} 
+    	}
 
-    	return $this->request->get($name);
+    	$data = $this->request->get($name);
+    	if ($data) {
+    		return $data->getValue();
+    	}
+
+    	return NULL;
     }
 }

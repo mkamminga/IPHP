@@ -50,7 +50,7 @@ return [
 				//Categories
 				new RouteCollection('/categories', [], routeResource('Categories', App\Controllers\Backend\CategoriesController::class)),
 				//Products
-				new RouteCollection('/categories', [], routeResource('Products', App\Controllers\Backend\ProductsController::class)),
+				new RouteCollection('/products', [], routeResource('Products', App\Controllers\Backend\ProductsController::class)),
 			])
 		])
 	]

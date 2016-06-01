@@ -22,6 +22,10 @@ class Request {
 		if (strlen($this->baseUrl) > 1){
 			$this->currentUrl = str_replace($this->baseUrl, '', $this->currentUrl);
 		}
+		
+		if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
+			$this->currentUrl = str_replace('?' . $_SERVER['QUERY_STRING'], '', $this->currentUrl);
+		}
 
 		$currentUrlLength = strlen($this->currentUrl);
 		if ($currentUrlLength > 1 && $this->currentUrl[0] != "/"){

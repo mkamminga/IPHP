@@ -1,38 +1,33 @@
 <?php
 
-namespace App\Http\Controllers\Cms;
+namespace App\Controllers\Backend;
+use App\Controllers\Controller;
 
-use Illuminate\Http\Request;
+use IPHP\Http\Request;
+use App\Product;
+use IPHP\Validation\Validator;
 
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
-use App\Http\Models\Product;
-use App\Http\Models\Categorie;
-use App\Http\Traits\ReturnAssoc;
-use Validator;
-use Storage;
-use Config;
-
-class Products extends Controller
+class ProductsController extends Controller
 {
-    use ReturnAssoc;
     /**
      * Display a listing of the resource.
      *
      * @return Response
      */
-    public function index(Request $request)
+    public function overview(Request $request)
     {
 
-        $inputs = $request->all();
-        $products = Product::with('categories');
-        if (isset($inputs['artikelnr']) && !empty($inputs['artikelnr'])) {
-            $products = $products->withArtnr($inputs['artikelnr']);
+        $inputs         = $request->all();
+        $products       = new Product;
+        $products       = $products->with('category');
+        $productData    = $products->all();
+        if (isset($inputs['artikelnr']) && !empty($inputs['artikelnr']->getValue())) {
+            $productData = $products->withArtnr($productData, (int)$inputs['artikelnr']->getValue());
         }
+       
+        $productData = $products->get($productData->orderBy('name'));
 
-        $products = $products->orderBy('name')->paginate(15);
-
-        return view('cms.products.overview', ['products' => $products])->withInput($inputs);
+        return $this->view('cms::products::overview.php', ['products' => $productData]);
     }
 
     /**
@@ -40,7 +35,7 @@ class Products extends Controller
      *
      * @return Response
      */
-    public function create()
+    public function showAdd()
     {
         $vatSettings = $this->getProcessedVat();
         $categories = $this->getProcessedCategories();
@@ -56,7 +51,7 @@ class Products extends Controller
      *
      * @return Response
      */
-    public function store(Request $request)
+    public function post(Request $request)
     {
         $requestData = $request->all();
   		$validator = $this->getValidator($requestData);

@@ -5,6 +5,7 @@ use App\Controllers\Controller;
 
 use IPHP\Http\Request;
 use App\Product;
+use App\VatRate;
 use IPHP\Validation\Validator;
 
 class ProductsController extends Controller
@@ -205,9 +206,10 @@ class ProductsController extends Controller
      * @return [type] [description]
      */
     private function getProcessedVat() {
+        $vatRates = new VatRate;
         $vat = Config::get('static_values.vat');
 
-        return $this->getAssocValues($vat);
+        return $vatRates->get();
     }
     /**
      * [getValidator description]

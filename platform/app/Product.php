@@ -9,7 +9,8 @@ use IPHP\Database\Selectable;
 class Product extends Model {
 	protected $table = 'products';
 	protected $primaryKeys = ['id'];
-
+	protected $softDelete = true;
+	
 	public function all () {
 		return $this->select();	
 	}

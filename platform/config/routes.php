@@ -14,10 +14,16 @@ function routeResource ($name, $class) {
 	];
 }
 
+function add (array $data, Route $route) {
+	$data[] = $route;
+	
+	return $data;
+}
+
 return [
 	'settings' => [
 		'defaults' => [
-			'[num]' => '[0-9]+',
+			'[num]' => '-?[0-9]+',
 			'[alpha_num]' => '[A-z\_0-9\-]+'
 		],
 		'exceptions' => [
@@ -50,7 +56,11 @@ return [
 				//Categories
 				new RouteCollection('/categories', [], routeResource('Categories', App\Controllers\Backend\CategoriesController::class)),
 				//Products
-				new RouteCollection('/products', [], routeResource('Products', App\Controllers\Backend\ProductsController::class)),
+				new RouteCollection('/products', [], add(
+					routeResource('Products', App\Controllers\Backend\ProductsController::class),
+					new Route('ProductsSubCategories', '/category/[num:id]/subcategories', 'get', App\Controllers\Backend\ProductsController::class, 'ajaxSubcategories')
+				)),
+				
 			])
 		])
 	]

@@ -18,6 +18,7 @@ class Validator {
 		'min' 			=> 'validateMinSize',
 		'max' 			=> 'validateMaxSize',
 		'mime'			=> 'validateMimeType',
+		'regex'			=> 'validateRegex'
 	];
 
 	protected $nonEscapeable = [
@@ -56,7 +57,11 @@ class Validator {
 				
 
 					if (!$this->{$realMethod}($value, $bounds)) {
-						$this->errors[$inputName] = $this->parseMessage($methodFromRule, $rule->getFieldname(), $bounds);	
+						$rawMessage = '';
+						if ($rule->hasMessageFor($methodFromRule)) {
+							$rawMessage = $rule->getMessageFor($methodFromRule);
+						}
+						$this->errors[$inputName] = $this->parseMessage($methodFromRule, $rule->getFieldname(), $bounds, $rawMessage);	
 
 						break;
 					}
@@ -83,8 +88,10 @@ class Validator {
 		$method = $data[0];
 	}
 
-	private function parseMessage ($key, $fieldname, $bounds):string {
-		$rawMessage = $this->translator->get('validator', $key);
+	private function parseMessage ($key, $fieldname, $bounds, $rawMessage = ''):string {
+		if (empty($rawMessage)){
+			$rawMessage = $this->translator->get('validator', $key);
+		}
 		$replaceable = [];
 
 		foreach ($bounds as $key => $value) {
@@ -109,8 +116,16 @@ class Validator {
 		$this->errors[$key] = $error;
 	}
 
-	private function validateRequired (RequestInput $data):bool {
-		return !$data->isEmpty();
+	private function validateRequired ($data):bool {
+		return ($data && $data instanceof RequestInput && !$data->isEmpty());
+	}
+	
+	private function validateRegex (RequestInput $data, $params = []):bool {
+		if (!isset($params['expression'])) {
+			throw new \Exception("Expression not set!");
+		}
+		
+		return preg_match($params['expression'], $data->getValue());
 	}
 
 	private function validateEmail (RequestInput $email):bool {

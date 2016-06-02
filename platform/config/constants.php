@@ -1,6 +1,6 @@
 <?php
 $public = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR;
-$images_dir = DIRECTORY_SEPARATOR . 'images';;
+$images_dir = DIRECTORY_SEPARATOR . 'images';
 return [
 	'paths' => [
 		'public'	=> [

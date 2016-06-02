@@ -102,6 +102,16 @@ class Model {
 			return NULL;
 		}
 	}
+	
+	public function getCollection (Selectable $select) {
+		$queryResult = $this->farceGet($select);
+
+		if ($queryResult){
+			return $queryResult;
+		}
+		
+		return [];
+	}
 
 	private function fill ($results, $single = false) {
 		$collection = [];

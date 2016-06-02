@@ -6,7 +6,7 @@ class Form {
 		$input = '<input type="'. $type .'" name="'. $name .'" value="'. $value .'"';
 
 		if (!empty($attr)) {
-			$input.= $this->parseAttrs($attr);
+			$input.= ' '. $this->parseAttrs($attr);
 		}
 
 		$input.= ">\n";
@@ -44,7 +44,7 @@ class Form {
 
 		$output = '<select name="'. $name .'"';
 		if (!empty($attr)) {
-			$output.= $this->parsedAttrs($attr);
+			$output.= ' ' . $this->parseAttrs($attr);
 		}
 
 		$output.='>'. chr(13) . chr(9);
@@ -77,5 +77,17 @@ class Form {
 		}
 
 		return $this->input('file', $name, '', $attr);
+	}
+	
+	public function textarea (string $name, $value, array $attr = []) {
+		$data = '<textarea name="'. $name .'"';
+		
+		if (!empty($attr)) {
+			$data.= $this->parseAttrs($attr);
+		}
+		
+		$data.='>' . $value . '</textarea>';
+		
+		return $data;
 	}
 }

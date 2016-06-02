@@ -8,8 +8,7 @@ use IPHP\Http\Request;
 use IPHP\Http\Routing\Router;
 use IPHP\Http\Routing\RouteMatch;
 use IPHP\View\Compiler\Compiler;
-use IPHP\View\ViewResponse;
-use IPHP\View\View;
+use IPHP\View\Response as ViewResponse;
 
 class HttpKernel extends Kernel {
 	private $router;
@@ -84,14 +83,12 @@ class HttpKernel extends Kernel {
 	}
 
 	public function finnish (ViewResponse $viewResponse) {
-		if ($this->app->hasConfig('app')){
-			$viewsPaths = $this->app->getConfig('app')->getValue('views');
-			$view = new View($viewResponse, $viewsPaths, $this->app);
-			$view->render();
-			$this->app->getService('eventManager')->publish('finnish');
-			
-		} else {
-			throw new \Exception("Undefined config: App ");
-		}
+		$reflectionService = $this->app->getService('reflectorService');
+		$strategyClass = $viewResponse->getStrategy();
+		//throws exception on failure
+		$strategy = $reflectionService->createInstance($strategyClass);
+		$strategy->resolve($viewResponse);
+		
+		$this->app->getService('eventManager')->publish('finnish');
 	}
 }

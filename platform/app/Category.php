@@ -29,4 +29,9 @@ class Category extends Model {
 		return $this->select()
 					->where((new Where)->isNull('Parent_id'));
 	}
+	
+	public function allFromParent (int $id) {
+		return $this->select()
+					->where((new Where())->equals('categories.Parent_id', $id));
+	}
 }

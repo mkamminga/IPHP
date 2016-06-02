@@ -21,8 +21,6 @@ class UserLoggedinFilter implements IRouteFilterable {
 
 	public function handle () {
 		if (!$this->user->isAdmin()) {
-			var_dump("is not admin");
-			exit;
 			$this->redirect();
 		}
 	}

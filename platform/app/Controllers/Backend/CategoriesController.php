@@ -187,7 +187,7 @@ class CategoriesController extends Controller
             }
             //on failure to save return false
             if (!$category->save()){
-                $validator->errors()->add('main', 'Er is een onbekende fout opgetreden tijdens het opslaan!');
+                $validator->addError('main', 'Er is een onbekende fout opgetreden tijdens het opslaan!');
                 return false;
             } 
            

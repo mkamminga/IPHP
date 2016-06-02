@@ -3,13 +3,21 @@
 namespace App\Controllers\Backend;
 use App\Controllers\Controller;
 
-use IPHP\Http\Request;
 use App\Product;
+use App\Category;
 use App\VatRate;
+
+use IPHP\Http\Request;
 use IPHP\Validation\Validator;
+use IPHP\Validation\Rule;
+use App\Helpers\InputToAssocHelper;
+
+use IPHP\File\File;
+use IPHP\File\UploadedFile;
 
 class ProductsController extends Controller
 {
+    use InputToAssocHelper;
     /**
      * Display a listing of the resource.
      *
@@ -38,12 +46,12 @@ class ProductsController extends Controller
      */
     public function showAdd()
     {
-        $vatSettings = $this->getProcessedVat();
-        $categories = $this->getProcessedCategories();
+        $vatSettings    = $this->getVat();
+        $categories     = $this->getCategories();
         
-        return view('cms.products.create', [
+        return $this->view('cms::products::create.php', [
             'categories' => $categories, 
-            'vat' => $vatSettings,
+            'vatRates' => $vatSettings,
         ]);
     }
 
@@ -52,76 +60,54 @@ class ProductsController extends Controller
      *
      * @return Response
      */
-    public function post(Request $request)
+    public function post(Request $request, Validator $validator)
     {
-        $requestData = $request->all();
-  		$validator = $this->getValidator($requestData);
-
-        if (!$validator->fails()) {
-
-            $product = new Product();
-            $product->Categories_id = $requestData['category'];
-            $product->name = $requestData['name'];
-            $product->artikelnr = $requestData['artikelnr'];
-            $product->price = $requestData['price'];
-            $product->vat = $requestData['vat'];
-            $product->short_description = $requestData['short_description'];
-            $product->detail = $requestData['detail'];
-            $product->main_image_link = 'main.' . $request->file('main_image_link')->guessExtension();
-            $product->small_image_link = 'small.' . $request->file('small_image_link')->guessExtension();
-          
-            //var_dump(file_get_contents($request->file('main_image_link')->getRealPath()));
-            $basePath = $this->getImageBasePath($product->artikelnr);
-            $request->file('main_image_link')->move($basePath, $product->main_image_link);
-            $request->file('small_image_link')->move($basePath, $product->small_image_link);
-
-            if ($product->save()){
-                return redirect()->route('beheer.products.index');
+        $product = new Product;
+        if ($this->save($request, $validator, $product)) {
+            if ($this->saveImages($request, $product)) {
+                $this->redirect()->toRoute('ProductsOverview');
             } else {
-                $validator->errors()->add('main', 'Er is een onbekende fout opgetreden tijdens het opslaan!');
+                //reverse any storage of files and the creation of the dir
+                $file = new File;
+                $file->removeDir($this->getSavePath($product), true);
+                $product->delete();
+                $validator->addError('main', 'Fout tijdens het opslaan van de afbeeldingen!');
             }
         }
 
-        return redirect()->route('beheer.products.create')
-                ->withErrors($validator)
-                ->withInput();
+        $viewResponse = $this->showAdd();
+        $viewResponse->setVar('errors', $validator->getErrors());
+        
+        if ($request->get('mainCategory') && !$request->get('mainCategory')->isEmpty()) {
+            $subCategories = $this->getSubCategories($request->get('mainCategory')->getValue());
+            
+            $viewResponse->setVar('subCategories', $this->collectionToAssoc($subCategories, 'id', 'name'));
+        }
+        
+        return $viewResponse;
     }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function show($id)
-    {
-        $product = Product::find($id);
-
-
-        return view('cms.products.delete', ['product' => $product]);
-    }
-
     /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
      * @return Response
      */
-    public function edit($id)
+    public function showEdit(int $id)
     {
-        $vatSettings = $this->getProcessedVat();
-        $product = Product::find($id);
-
-        if (!$product){
-            throw new Exception("Product not found!");
-        }
-
-        $categories = $this->getProcessedCategories();
-
-        return view('cms.products.edit', [
-            'product' => $product, 
+        $product        = $this->getProductOrFail($id); 
+        $category       = $product->getRelated('category');
+        
+        $vatSettings    = $this->getVat();
+        $categories     = $this->getCategories();
+        $subCategories  = $this->collectionToAssoc($this->getSubCategories((int)$category->retreive('Parent_id')), 'id', 'name');
+        
+        $product->set('mainCategory', $category->retreive('Parent_id'));
+        
+        return $this->view('cms::products::edit.php', [
+            'product'   => $product,
             'categories' => $categories, 
-            'vat' => $vatSettings,
+            'subCategories' => $subCategories,
+            'vatRates' => $vatSettings,
         ]);
     }
 
@@ -131,47 +117,9 @@ class ProductsController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function update($id, Request $request)
+    public function put($id, Request $request)
     {
-        $requestData = $request->all();
-        $validator = $this->getValidator($requestData, false, $id);
-
-        if (!$validator->fails()) {
-            $product = Product::find($id);
-            if (!$product) {
-                throw new Exception("Product not found!");
-            } 
-
-            $product->Categories_id = $requestData['category'];
-            $product->name = $requestData['name'];
-            $product->artikelnr = $requestData['artikelnr'];
-            $product->price = $requestData['price'];
-            $product->vat = $requestData['vat'];
-            $product->short_description = $requestData['short_description'];
-            $product->detail = $requestData['detail'];
-
-            $basePath = $this->getImageBasePath($product->artikelnr);
-            if ($request->hasFile('main_image_link')) {
-            	$oldname = $product->main_image_link;
-            	$this->replaceImage($basePath, $oldname, $request->file('main_image_link'), ($product->main_image_link = 'main.' . $request->file('main_image_link')->guessExtension()));
-            }
-
-            if ($request->hasFile('small_image_link')) {
-            	$oldname = $product->small_image_link;
-            	$this->replaceImage($basePath, $oldname, $request->file('small_image_link'), ($product->main_image_link = 'small.' . $request->file('small_image_link')->guessExtension()));
-            }
-
-            if ($product->save()){
-                return redirect()->route('beheer.products.index');
-            } else {
-                $validator->errors()->add('main', 'Er is een onbekende fout opgetreden tijdens het opslaan!');
-            }
-
-        }
-
-        return redirect()->route('beheer.products.edit', ['id' => $id])
-                ->withErrors($validator)
-                ->withInput();
+       
     }
 
     /**
@@ -188,64 +136,153 @@ class ProductsController extends Controller
         return redirect()->route('beheer.products.index');
     }
     /**
-     * Get all the current categories and return them in an [id=>name] format
+     * Retreives all sub categories from a provided parent category (id). Returns the result as a jsonresponse
      * 
-     * @return [type] [description]
+     * @param int $id parent id
+     * @return JsonResponse
      */
-    private function getProcessedCategories () {
-        $parsedCategories = [];
-        $categories = Categorie::all();
-        foreach ($categories as $category) {
-            $parsedCategories[$category->id] = $category->name;
-        }
-
-        return $parsedCategories;
+    public function ajaxSubcategories ($id) {
+        return $this->json($this->getSubCategories((int)$id));
+    }
+    /**
+     * Helper function that fetches and returns a collection of subcategories from a provided parent category id and 
+     * 
+     * @param int $id parent id
+     * @return array collection
+     */
+    private function getSubCategories (int $parentId) {
+        $category = new Category;
+        return $category->getCollection($category->byName($category->allFromParent($parentId))); 
     }
     /**
      * [getProcessedVat description]
      * @return [type] [description]
      */
-    private function getProcessedVat() {
+    private function getVat() {
         $vatRates = new VatRate;
-        $vat = Config::get('static_values.vat');
+        $rates    = $vatRates->get($vatRates->select());
+        $return = [];
+        foreach ($rates as $rate) {
+            $return[$rate->retreive('id')] = $rate->retreive('rate');
+        }
+        
+        return $return;
+    }
+    
+    private function getCategories () {
+        $category = new Category;
 
-        return $vatRates->get();
+        $categories = $category->get($category->byName($category->allParent()));
+
+        $parents = [];
+        foreach ($categories as $parent) {
+            $parents[$parent->retreive('id')] = $parent->retreive('name');
+        }
+
+        return $parents;
+    }
+    /**
+     * Attempt to get a product by id. Failure to do so will cause an exception.
+     *
+     * @param int $id product id
+     * return Product
+     */
+    private function getProductOrFail (int $id) {
+        $product = new Product;
+        
+        $product = $product->with('category')->find($id);
+        
+        if (!$product){
+            throw new Exception("Could not find Product with id: ". $id);
+        }
+        
+        return $product;
     }
     /**
      * [getValidator description]
      * @param  Request $request [description]
      * @return [type]           [description]
      */
-    private function getValidator (array $requestData, $requireImages = true, $id = 0) {
-    	$rules = [
-            'category' => 'required',
-            'name' => 'required|max:20',
-            'artikelnr' => 'required|max:20|unique:products,artikelnr,'. $id,
-            'price' => 'required|regex:/^\d*(\.\d{2})?$/',
-            'vat' => 'required',
-            'short_description' => 'required|min:10|max:255',
-            'main_image_link' => 'max:10000|mimes:jpg,jpeg,png,gif',
-            'small_image_link' => 'max:10000|mimes:jpg,jpeg,png,gif',
-            'detail' => 'required|min:20'
-        ];
-
-        if ($requireImages) {
-        	$rules['main_image_link'] = 'required|' . $rules['main_image_link'];
-        	$rules['small_image_link'] = 'required|' . $rules['small_image_link'];
+    private function save (Request $request, Validator $validator, Product $product) {
+    	
+        $validator->addRules([
+            new Rule('mainCategory', 'Hoofd categorie', ['required']),
+            new Rule('Categories_id', 'Sub categorie', ['required']),
+            new Rule('name', 'Naam', ['required', 'min:size=2', 'max:size=20']),
+            new Rule('artikelnr', 'Artikel nummer', ['required', 'num']),
+            new Rule('price', 'Prijs', ['required', 'regex:expression=/^\d*(\.\d{2})?$/'], ['regex' => ':field is geen geldige prijs!']),
+            new Rule('vat_rate_id', 'Btw', ['required']),
+            new Rule('short_description', 'Korte omschrijving', ['required', 'min:size=10', 'max:size=255']),
+            new Rule('detail', 'Omschrijving', ['required', 'min:size=10', 'max:size=3000']),
+            new Rule('main_image_link', 'Hoofd afbeelding', ['required', 'mime:prefix=image|types=jpg,jpeg,png,gif']),
+            new Rule('small_image_link', 'Kleine afbeelding', ['required', 'mime:prefix=image|types=jpg,jpeg,png,gif']), 
+        ]);
+        
+        $all = $request->all();
+        
+        if ($validator->validate($all)){
+            //save
+            $product->set('Categories_id', $all["Categories_id"]->getValue());
+            $product->set('name', $all["name"]->getValue());
+            $product->set('artikelnr', $all["artikelnr"]->getValue());
+            $product->set('price', $all["price"]->getValue());
+            $product->set('vat_rate_id', $all["vat_rate_id"]->getValue());
+            $product->set('short_description', $all["short_description"]->getValue());
+            $product->set('detail', $all["detail"]->getValue());
+            
+            $file = new File;
+            //Main image
+            if (!$all['main_image_link']->isNull()){
+                $product->set('main_image_link', $file->normilizeName($all['main_image_link']->realName()));
+            }
+            // thumb             
+            if (!$all['small_image_link']->isNull()){
+                $product->set('small_image_link', 'thumb_' . $file->normilizeName($all['small_image_link']->realName()));
+            }
+            
+            if ($product->save()) {
+                return true;
+            } else {
+                $validator->addError('main', 'Er is een onbekende fout opgetreden tijdens het opslaan!');
+                
+                return false;
+            }
+        }
+    	
+        return false;
+    }
+    
+    private function saveImages (Request $request, Product $product) {
+        $images = ['main_image_link', 'small_image_link'];
+        $dir = $this->getSavePath($product);
+        
+        try {
+            $file = new File;
+            //throws exception onfailure
+            $file->createDir($dir);
+       
+            foreach ($images as $image){
+                //the image
+                if (!$request->fromFiles($image)->isNull()){
+                    $uploadedFile = new UploadedFile($request->fromFiles($image)->getValue());
+                    //move the uploaded image to the newly created products images folder
+                    if (!$uploadedFile->move($dir, $product->retreive($image))){
+                        //onfailure return false
+                        return false;
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            return false;
         }
 
-    	return Validator::make($requestData, $rules);
+        return true;
     }
     /**
-     * [getImageBasePath description]
+     * return the savepath for a specific product
      * @return [type] [description]
      */
-    private function getImageBasePath ($artikelnr) {
-    	return public_path() . '/images/products/'. $artikelnr . '/';
-    }
-
-    private function replaceImage ($basePath, $oldFile, $file, $newFile) {
-    	unlink($basePath . $oldFile);
-    	$file->move($basePath, $newFile);
+    private function getSavePath (Product $product) {
+    	return public_path . DIRECTORY_SEPARATOR.  product_images_dir . DIRECTORY_SEPARATOR. $product->retreive('id') . DIRECTORY_SEPARATOR;
     }
 }

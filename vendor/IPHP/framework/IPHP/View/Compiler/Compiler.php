@@ -13,6 +13,10 @@ class Compiler {
 		$this->compiledPath = $outputPath;
 		$this->cachemapPath = $cachemapPath;
 	}
+	
+	public function getCompiledPath () {
+		return $this->compiledPath;
+	}
 
 	public function shouldCompile(ViewResponse $viewResponse) {
 		$viewName = $this->getCompiledname($viewResponse);

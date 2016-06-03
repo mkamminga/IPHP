@@ -47,6 +47,24 @@ class File {
 
 		return false;
 	}
+	
+	public function removeAllButFromDir ($dir, array $exceptions = []):bool {
+		$files = array_diff(scandir($dir), array('.','..'));
+
+		foreach ($files as $file) {
+			$path = $dir. DIRECTORY_SEPARATOR . $file;
+
+			if (is_dir($path)){
+				if (!$this->removeDir($path, true)) {
+					return false;
+				}
+			} else if (!in_array($file, $exceptions) && !$this->remove($path)){
+				throw new \Exception("Error removing file '". $file ."' in dir '". $dir ."'");
+			}
+		}
+		
+		return true;
+	}
 
 	public function getName ($filepath):string {
 		return basename($filepath);

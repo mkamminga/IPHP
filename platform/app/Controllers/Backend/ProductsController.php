@@ -18,6 +18,8 @@ use IPHP\File\UploadedFile;
 class ProductsController extends Controller
 {
     use InputToAssocHelper;
+    
+    private $images = ['main_image_link', 'small_image_link'];
     /**
      * Display a listing of the resource.
      *
@@ -45,14 +47,8 @@ class ProductsController extends Controller
      * @return Response
      */
     public function showAdd()
-    {
-        $vatSettings    = $this->getVat();
-        $categories     = $this->getCategories();
-        
-        return $this->view('cms::products::create.php', [
-            'categories' => $categories, 
-            'vatRates' => $vatSettings,
-        ]);
+    {   
+        return $this->view('cms::products::create.php', $this->fillGetView());
     }
 
     /**
@@ -75,16 +71,10 @@ class ProductsController extends Controller
             }
         }
 
-        $viewResponse = $this->showAdd();
-        $viewResponse->setVar('errors', $validator->getErrors());
-        
-        if ($request->get('mainCategory') && !$request->get('mainCategory')->isEmpty()) {
-            $subCategories = $this->getSubCategories($request->get('mainCategory')->getValue());
-            
-            $viewResponse->setVar('subCategories', $this->collectionToAssoc($subCategories, 'id', 'name'));
-        }
-        
-        return $viewResponse;
+        return $this->view('cms::products::create.php', $this->fillPostView([
+                'errors' => $validator->getErrors()
+            ], ($request->get('mainCategory') ? $request->get('mainCategory')->getValue() : NULL)
+        ));
     }
     /**
      * Show the form for editing the specified resource.
@@ -94,21 +84,15 @@ class ProductsController extends Controller
      */
     public function showEdit(int $id)
     {
-        $product        = $this->getProductOrFail($id); 
+        $product        = new Product;
+        $product        = $product->with('category')->findOrFail($id);    
         $category       = $product->getRelated('category');
-        
-        $vatSettings    = $this->getVat();
-        $categories     = $this->getCategories();
-        $subCategories  = $this->collectionToAssoc($this->getSubCategories((int)$category->retreive('Parent_id')), 'id', 'name');
-        
+       
         $product->set('mainCategory', $category->retreive('Parent_id'));
         
-        return $this->view('cms::products::edit.php', [
+        return $this->view('cms::products::edit.php', $this->fillPostView([
             'product'   => $product,
-            'categories' => $categories, 
-            'subCategories' => $subCategories,
-            'vatRates' => $vatSettings,
-        ]);
+        ], $category->retreive('Parent_id')));
     }
 
     /**
@@ -117,24 +101,81 @@ class ProductsController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function put($id, Request $request)
+    public function put($id, Request $request, Validator $validator)
     {
+       $product = new Product;
+       $product = $product->with('category')->findOrFail($id); 
        
+       $extractImagesFromProduct = function () use ($product) {
+           $images = [];
+           foreach ($this->images as $image) {
+            $images[$image] = $product->retreive($image);
+           }
+           
+           return $images;
+       };
+       //Ssave a referenve to the old images
+       $oldImages       = $extractImagesFromProduct();
+       
+       if ($this->save($request, $validator, $product, true)) {
+            $currentImages = $extractImagesFromProduct();
+            
+            $file = new File;
+            $dir = $this->getSavePath($product);
+            if ($this->saveImages($request, $product)) {
+                //remove oldimages
+                $file->removeAllButFromDir($dir, array_values($currentImages));
+                
+                $this->redirect()->toRoute('ProductsOverview');
+            } else {
+                $validator->addError('Fout tijdens het opslaan van de afbeeldingen!');
+                //reset old files
+                foreach ($oldImages as $name => $file) {
+                    $product->set($name, $file);
+                }
+                
+                $product->save();
+                //remove any saved files
+                $file->removeAllButFromDir($dir, array_values($oldImages));
+            }
+        }
+       
+       return $this->view('cms::products::edit.php', $this->fillPostView([
+                'errors' => $validator->getErrors(),
+                'product' => $product
+            ], ($request->get('mainCategory') ? $request->get('mainCategory')->getValue() : NULL)
+        ));
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Show a delete form confirmation form
      *
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id)
+    public function showDelete($id)
     {
-        if (($product = Product::find($id))) {
-            $product->delete();
-        }
-        return redirect()->route('beheer.products.index');
+        $product = (new Product)->findorFail($id);
+        
+        return $this->view('cms::default.delete.php', ['name' => $product->retreive('name')]);
     }
+    
+    /**
+     * Remove a product (softdelete)
+     *
+     * @param  int  $id
+     * @return void
+     */
+     public function delete ($id) {
+         $product = (new Product)->findorFail($id);
+         if (!$product->softDelete()){
+            throw new Exception("Kon product niet verwijderen!");
+         } else {
+            $file = new File;
+            $file->removeDir($this->getSavePath($product));
+            $this->redirect()->toRoute('ProductsOverview');
+         }
+     }
     /**
      * Retreives all sub categories from a provided parent category (id). Returns the result as a jsonresponse
      * 
@@ -143,6 +184,35 @@ class ProductsController extends Controller
      */
     public function ajaxSubcategories ($id) {
         return $this->json($this->getSubCategories((int)$id));
+    }
+    /**
+     * Fill the data array with default settings that apply to all (from) get views
+     *
+     * @param array $data the data array
+     * @return array
+     */
+    private function fillGetView (array $data = []) {
+        return array_merge($data, [
+            'vatRates' => $this->getVat(),
+            'categories' => $this->getCategories()
+        ]);
+    }
+    /**
+     * Fill the data array with default settings that apply to all (from) get views
+     *
+     * @param array $data the data array
+     * @return array
+     */
+    private function fillPostView (array $data = [], $subcategoriesParentid = NULL) {
+        $data = $this->fillGetView($data);
+        $subCategories = [];
+        if ($subcategoriesParentid) {
+            $subCategories  = $this->collectionToAssoc($this->getSubCategories((int)$subcategoriesParentid), 'id', 'name');
+        }
+        
+        $data['subCategories'] = $subCategories;
+        
+        return $data;
     }
     /**
      * Helper function that fetches and returns a collection of subcategories from a provided parent category id and 
@@ -160,51 +230,26 @@ class ProductsController extends Controller
      */
     private function getVat() {
         $vatRates = new VatRate;
-        $rates    = $vatRates->get($vatRates->select());
-        $return = [];
-        foreach ($rates as $rate) {
-            $return[$rate->retreive('id')] = $rate->retreive('rate');
-        }
-        
-        return $return;
+        return $this->collectionToAssoc($vatRates->getCollection($vatRates->select()), 'id', 'description');
     }
-    
+    /**
+     * Returns all the 
+     */
     private function getCategories () {
         $category = new Category;
-
-        $categories = $category->get($category->byName($category->allParent()));
-
-        $parents = [];
-        foreach ($categories as $parent) {
-            $parents[$parent->retreive('id')] = $parent->retreive('name');
-        }
-
-        return $parents;
+        return $this->collectionToAssoc($category->getCollection($category->byName($category->allParent())), 'id', 'name');
     }
     /**
-     * Attempt to get a product by id. Failure to do so will cause an exception.
-     *
-     * @param int $id product id
-     * return Product
-     */
-    private function getProductOrFail (int $id) {
-        $product = new Product;
-        
-        $product = $product->with('category')->find($id);
-        
-        if (!$product){
-            throw new Exception("Could not find Product with id: ". $id);
-        }
-        
-        return $product;
-    }
-    /**
-     * [getValidator description]
+     * 
      * @param  Request $request [description]
      * @return [type]           [description]
      */
-    private function save (Request $request, Validator $validator, Product $product) {
-    	
+    private function save (Request $request, Validator $validator, Product $product, $edit = false) {
+    	$imageRequirements = ['mime:prefix=image|types=jpg,jpeg,png,gif'];
+        if (!$edit) {
+            array_unshift($imageRequirements, 'required');
+        }
+        
         $validator->addRules([
             new Rule('mainCategory', 'Hoofd categorie', ['required']),
             new Rule('Categories_id', 'Sub categorie', ['required']),
@@ -214,8 +259,8 @@ class ProductsController extends Controller
             new Rule('vat_rate_id', 'Btw', ['required']),
             new Rule('short_description', 'Korte omschrijving', ['required', 'min:size=10', 'max:size=255']),
             new Rule('detail', 'Omschrijving', ['required', 'min:size=10', 'max:size=3000']),
-            new Rule('main_image_link', 'Hoofd afbeelding', ['required', 'mime:prefix=image|types=jpg,jpeg,png,gif']),
-            new Rule('small_image_link', 'Kleine afbeelding', ['required', 'mime:prefix=image|types=jpg,jpeg,png,gif']), 
+            new Rule('main_image_link', 'Hoofd afbeelding', $imageRequirements),
+            new Rule('small_image_link', 'Kleine afbeelding', $imageRequirements), 
         ]);
         
         $all = $request->all();
@@ -253,7 +298,6 @@ class ProductsController extends Controller
     }
     
     private function saveImages (Request $request, Product $product) {
-        $images = ['main_image_link', 'small_image_link'];
         $dir = $this->getSavePath($product);
         
         try {
@@ -261,7 +305,7 @@ class ProductsController extends Controller
             //throws exception onfailure
             $file->createDir($dir);
        
-            foreach ($images as $image){
+            foreach ($this->images as $image){
                 //the image
                 if (!$request->fromFiles($image)->isNull()){
                     $uploadedFile = new UploadedFile($request->fromFiles($image)->getValue());

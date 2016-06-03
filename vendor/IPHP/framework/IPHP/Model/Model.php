@@ -54,6 +54,24 @@ class Model {
 	 * Set the queryiable to find with an id set
 	 */
 	public function find (...$ids) {
+		return $this->findByIds($ids);
+	}
+	/**
+	 * Find a resource by id(s) of fail (throws an exception)
+	 * 
+	 * @return Model
+	 */
+	public function findOrFail (...$ids) {
+		$model = $this->findByIds($ids);
+		
+		if (!$model) {
+			throw new \Exception("Failed to retreive resource!");
+		}
+		
+		return $model;
+	}
+	
+	private function findByIds (array $ids = []) {
 		$where = new Where;
 		$i = 0;
 		foreach ($ids as $id) {

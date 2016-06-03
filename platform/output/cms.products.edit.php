@@ -209,8 +209,6 @@ $(document).foundation();
 				}, 'json');
 			}
 		});
-		
-		
 	});	
 	</script>
 </div>

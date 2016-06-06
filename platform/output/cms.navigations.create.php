@@ -37,7 +37,7 @@
                         <li><a href="<?php print($url->route('Dashboard')); ?>">Dashboard</a></li>
                         <li><a href="<?php print($url->route('NavigationOverview')); ?>">Navigatie</a></li>
                         <li><a href="{{ URL::route('beheer.orders.index') }}">Orders</a></li>
-                        <li><a href="{{ URL::route('beheer.products.index') }}">Products</a></li>
+                        <li><a href="<?php print($url->route('ProductsOverview')); ?>">Products</a></li>
                         <li><a href="<?php print($url->route('CategoriesOverview')); ?>">Categories</a></li>
                         <li><a href="{{ URL::route('beheer.users.index') }}">Gebruikers</a></li>
                     </ul>
@@ -53,9 +53,9 @@
     	print($this->service('htmlMessages')->errors($errors));
     endif;
 
-    $form = $this->service('form');
-	$input = $this->service('input');
-	?>
+  	$form = $this->service('form');
+		$input = $this->service('input');
+		?>
 	<form action="" method="post">
 		<div class="row">
 		    <div class="large-12 columns">
@@ -116,7 +116,13 @@
             </div>
         </footer>
     </div>    
-	</div>
+	
+<script src="/js/vendor/jquery.js"></script>
+<script src="/js/foundation.min.js"></script>
+<script>
+$(document).foundation();
+</script>
+</div>
 
 </body>
 </html>

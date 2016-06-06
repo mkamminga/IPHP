@@ -2,6 +2,7 @@
 namespace App;
 
 use IPHP\Model\Model;
+use IPHP\Model\HasMany;
 use IPHP\Database\Selectable;
 use IPHP\Database\Where;
 
@@ -33,5 +34,9 @@ class Category extends Model {
 	public function allFromParent (int $id) {
 		return $this->select()
 					->where((new Where())->equals('categories.Parent_id', $id));
+	}
+	
+	public function relatedSubCategories () {
+		return new HasMany(new Category, 'Parent_id', 'id', 'subCategories');
 	}
 }

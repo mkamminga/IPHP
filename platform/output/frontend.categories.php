@@ -11,6 +11,10 @@
 </head>
 <body>
 <div id="main">
+    <?php
+    $messages = $this->service('htmlMessages');
+    $messages->errorClass('alert-box alert');
+    ?>
 	<?php if (!isset($menus) || $menus != $__view->getInjectedVar("menus")){$menus=$__view->getInjectedVar("menus");}if (!isset($breadcrumbs) || $breadcrumbs != $__view->getInjectedVar("breadcrumbs")){$breadcrumbs=$__view->getInjectedVar("breadcrumbs");}if (!isset($userGuard) || $userGuard != $__view->getInjectedVar("userGuard")){$userGuard=$__view->getInjectedVar("userGuard");} ?>
             <div style="background-color: white">
     <div class="large-2 small-6 columns">
@@ -42,11 +46,12 @@
         <section class="top-bar-section">
         <!-- Left Nav Section -->
         <ul class="left">
-            <li><a href="<?php print($this->service('url')->route('Home'));?>">Home</a>
             <?php
+            $url = $this->service('url');
+            
             foreach ($menus as $menu):
             ?>
-                <li><a href="<?php print($menu->retreive('link')); ?>"><?php print($menu->retreive('name')); ?></a></li>
+                <li><a href="<?php print($url->route($menu->link)); ?>"><?php print($menu->name); ?></a></li>
             <?php
             endforeach;
             ?>

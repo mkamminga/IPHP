@@ -10,7 +10,7 @@ class HasMany extends ModelRelation {
 			if ($this->where) {
 				$where->clause($this->where);
 			}
-			$all = $this->model->get($this->model->select()->where(
+			$all = $this->model->get($this->select->where(
 				$where
 			));
 	

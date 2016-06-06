@@ -16,6 +16,11 @@ abstract class ModelRelation {
 		$this->foreignKey = $foreignKey;
 		$this->name = $name;
 		$this->where = new Where;
+		$this->select = $model->select();
+	}
+	
+	public function select () {
+		return $this->select;
 	}
 
 	public function where () {

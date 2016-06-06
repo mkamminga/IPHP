@@ -284,6 +284,12 @@ class Model {
 
 		return $this;
 	}
+	
+	public function withRelated (ModelRelation $related) {
+		$this->with[] = $related;
+		
+		return $this;
+	}
 
 	public function setRelated ($name, Model $modelRelated) {
 		$this->related[$name] = $modelRelated;

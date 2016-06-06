@@ -32,17 +32,31 @@
 
         <section class="top-bar-section">
         <!-- Left Nav Section -->
-        <ul class="left">
-            <li><a href="<?php print($this->service('url')->route('Home'));?>">Home</a>
-            <?php
-            foreach ($menus as $menu):
-            ?>
-                <li><a href="<?php print($menu->retreive('link')); ?>"><?php print($menu->retreive('name')); ?></a></li>
-            <?php
+        <?php
+        $url = $this->service('url');
+        
+        $displayMenu = function (array $items, $class = '') use($url, &$displayMenu) {
+            $output =   '<ul class="'. $class .'">' . chr(13) . chr(9);
+            foreach ($items as $menu):
+                $params = isset($menu->params) ? $menu->params : [];
+                $subMenu = isset($menu->subMenu) ? $menu->subMenu : [];
+                $output.= chr(9) . chr(9) .  '<li>'. chr(13) . chr(9). chr(9) . chr(9).  chr(9) . '<a href="'. $url->route($menu->link, $params) .'">'. $menu->name .'</a>' . chr(13) . chr(9) . chr(9);
+                
+                if (count($subMenu) > 0) {
+                    $output.= chr(9) . chr(9) . $displayMenu($subMenu, 'submenu') . chr(9);
+                }
+                
+                $output.=  chr(9) . '</li>'.chr(13) . chr(9);
             endforeach;
-            ?>
-        </ul>
-    
+            
+            $output.= chr(9) . '</ul>' . chr(13) . chr(9);
+            
+            return $output;
+       
+        };
+        
+        print($displayMenu($menus, 'left'));     
+        ?>
         <!-- Right Nav Section -->
         <ul class="right">
             <?php

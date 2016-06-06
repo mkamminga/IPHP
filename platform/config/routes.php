@@ -34,9 +34,20 @@ return [
 		//Frontend
 		new RouteCollection('', [App\Filters\RegisterViewComposerFilter::class => []], [
 			new Route('Home','/home?', 'get', App\Controllers\Frontend\HomeController::class, 'index'),
-			(new Route('Categories','/categories', 'get', App\Controllers\Frontend\CategoriesController::class, 'showSubcategories'))->addCollection([
-				new Route('CategoryProducts', '/[num:subcategory]/products', 'get', App\Controllers\Frontend\CategoriesController::class, 'showProducts')
+			//categories
+			(new Route('FrontendCategories','/categories', 'get', App\Controllers\Frontend\CategoriesController::class, 'showSubcategories'))->addCollection([
+				//Subcategories
+				(new Route('SubcategoriesOverview','/[num:category_id]/categories', 'get', App\Controllers\Frontend\CategoriesController::class, 'showSubcategories'))->addCollection([
+					//subcategiry products overview
+					new Route('CategoryProducts', '/[num:sub_category_id]/products', 'get', App\Controllers\Frontend\CategoriesController::class, 'showProducts')
+				])
 			]),
+			//About,
+			new Route('About', '/about', 'get', App\Controllers\Frontend\HomeController::class, 'index'),
+			//Policy
+			new Route('Policy', '/policy', 'get', App\Controllers\Frontend\PolicyController::class, 'index'),
+			//Contact
+			new Route('Contact', '/contact', 'get', App\Controllers\Frontend\ContactController::class, 'index'),
 			//Login
 			new Route('LoginGet','/login', 'get', App\Controllers\Frontend\LoginController::class, 'showLogin'),
 			new Route('LoginPost','/login', 'post', App\Controllers\Frontend\LoginController::class, 'postLogin'),

@@ -181,7 +181,7 @@
             </div>
         </footer>
     </div>    
-	
+</div>
 	
 <script src="/js/vendor/jquery.js"></script>
 <script src="/js/foundation.min.js"></script>
@@ -211,7 +211,5 @@ $(document).foundation();
 		});
 	});	
 	</script>
-</div>
-
 </body>
 </html>

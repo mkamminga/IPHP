@@ -9,14 +9,33 @@ use App\Product;
 class CategoriesController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of main categories.
      *
      * @return Response
      */
-    public function showSubcategories(Category $category)
+    public function showMainCategories()
     {
-        return new ViewResponse("frontend/categories.php", [
-            'categories' => $category->get( $category->all() )
+        $category = new Category;
+        
+        return new ViewResponse("frontend::categories::main.php", [
+            'categories' => $category->getCollection( $category->byName($category->allParent()) ) 
+        ]);
+    }
+    /**
+     * Display a listing of subcategories.
+     *
+     * @return Response
+     */
+    public function showSubcategories(int $category_id)
+    {
+        $category = new Category;
+
+        $mainCategory = $category->findOrFail($category_id);
+
+        return new ViewResponse("frontend::categories::sub.php", [
+            'categories' => $category->getCollection( $category->allFromParent($category_id) ),
+            'title' => 'Category: '. $mainCategory->retreive('name'),
+            'mainCategory' => $mainCategory
         ]);
     }
     /**
@@ -24,9 +43,9 @@ class CategoriesController extends Controller
      * @param  Request $request [description]
      * @return [type]           [description]
      */
-    public function showProducts(Product $product, int $subcategory)
+    public function showProducts(int $category_id, int $sub_category_id)
     {
-        return new ViewResponse("frontend/products.php", [
+        return new ViewResponse("frontend::categories::products.php", [
             'products' => $product->get( $product->fromCategory($subcategory) )
         ]);
     }

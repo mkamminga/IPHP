@@ -32,7 +32,7 @@ class FrontendViewComposer extends MainViewComposer {
 			$menuCategories 			= new \stdClass;
 			$menuCategories->link 		= "FrontendCategories";
 			$menuCategories->name 		= "Categorieën";
-			$menuCategories->submenu 	= [];
+			$menuCategories->subMenu 	= [];
 			
 			$relationSubCategories = $category->relatedSubCategories();
 			$category->byName($relationSubCategories->select());
@@ -62,7 +62,7 @@ class FrontendViewComposer extends MainViewComposer {
 					}
 				}
 				
-				$menu[] = $menuItem;
+				$menuCategories->subMenu[] = $menuItem;
 			}
 			
 						

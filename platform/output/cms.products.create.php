@@ -176,7 +176,7 @@
             </div>
         </footer>
     </div>    
-	
+</div>
 	
 <script src="/js/vendor/jquery.js"></script>
 <script src="/js/foundation.min.js"></script>
@@ -204,11 +204,7 @@ $(document).foundation();
 				}, 'json');
 			}
 		});
-		
-		
 	});	
 	</script>
-</div>
-
 </body>
 </html>

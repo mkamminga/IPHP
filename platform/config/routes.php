@@ -35,11 +35,13 @@ return [
 		new RouteCollection('', [App\Filters\RegisterViewComposerFilter::class => []], [
 			new Route('Home','/home?', 'get', App\Controllers\Frontend\HomeController::class, 'index'),
 			//categories
-			(new Route('FrontendCategories','/categories', 'get', App\Controllers\Frontend\CategoriesController::class, 'showSubcategories'))->addCollection([
+			(new Route('FrontendCategories','/categories', 'get', App\Controllers\Frontend\CategoriesController::class, 'showMainCategories'))->addCollection([
 				//Subcategories
 				(new Route('SubcategoriesOverview','/[num:category_id]/categories', 'get', App\Controllers\Frontend\CategoriesController::class, 'showSubcategories'))->addCollection([
 					//subcategiry products overview
-					new Route('CategoryProducts', '/[num:sub_category_id]/products', 'get', App\Controllers\Frontend\CategoriesController::class, 'showProducts')
+					(new Route('CategoryProducts', '/[num:sub_category_id]/products', 'get', App\Controllers\Frontend\ProductsController::class, 'showProducts'))->addCollection([
+						new Route('ProductItem', '/[num:product_id]', 'get', App\Controllers\Frontend\ProductsController::class, 'showProduct')
+					])
 				])
 			]),
 			//About,

@@ -10,7 +10,7 @@
     	print($this->service('htmlMessages')->errors($errors));
     endif;
 
-    $form = $this->service('form');
+  $form = $this->service('form');
 	$input = $this->service('input');
 	?>
 	<form action="" method="post" enctype="multipart/form-data">
@@ -25,7 +25,7 @@
 		<div class="row">
 		    <div class="large-12 columns">
 		      <label>Hoofdcategorie
-		        <?php print($form->select('parent', $parents, $input->raw('parent'))); ?>
+		        <?php print($form->select('Parent_id', $parents, $input->raw('Parent_id'))); ?>
 		      </label>
 		    </div>
 		</div>

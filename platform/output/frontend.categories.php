@@ -45,18 +45,31 @@
 
         <section class="top-bar-section">
         <!-- Left Nav Section -->
-        <ul class="left">
-            <?php
-            $url = $this->service('url');
-            
-            foreach ($menus as $menu):
-            ?>
-                <li><a href="<?php print($url->route($menu->link)); ?>"><?php print($menu->name); ?></a></li>
-            <?php
+        <?php
+        $url = $this->service('url');
+        
+        $displayMenu = function (array $items, $class = '') use($url, &$displayMenu) {
+            $output =   '<ul class="'. $class .'">' . chr(13) . chr(9);
+            foreach ($items as $menu):
+                $params = isset($menu->params) ? $menu->params : [];
+                $subMenu = isset($menu->subMenu) ? $menu->subMenu : [];
+                $output.= chr(9) . chr(9) .  '<li'. (count($subMenu) > 0 ? ' class="has-dropdown"': '') .'>'. chr(13) . chr(9). chr(9) . chr(9).  chr(9) . '<a href="'. $url->route($menu->link, $params) .'">'. $menu->name .'</a>' . chr(13) . chr(9) . chr(9);
+                
+                if (count($subMenu) > 0) {
+                    $output.= chr(9) . chr(9) . $displayMenu($subMenu, 'dropdown') . chr(9);
+                }
+                
+                $output.=  chr(9) . '</li>'.chr(13) . chr(9);
             endforeach;
-            ?>
-        </ul>
-    
+            
+            $output.= chr(9) . '</ul>' . chr(13) . chr(9);
+            
+            return $output;
+       
+        };
+        
+        print($displayMenu($menus, 'left'));     
+        ?>
         <!-- Right Nav Section -->
         <ul class="right">
             <?php
@@ -118,17 +131,17 @@ endif;
 
                         <?php
                         foreach ($categories as $category):
-                            $id = $category->retreive('id');
-                            $categoryUrl = $url->route('CategoryProducts', [
-                                'subcategory' => $id
+                            $id = $category->id;
+                            $categoryUrl = $url->route('SubcategoriesOverview', [
+                                'category_id' => $id
                             ]);
                         ?>
                             <div class="large-4 small-6 columns" id="<?php print($id) ?>" data-equalizer-watch>
                                 <a href="<?php print($categoryUrl) ?>">
-                                    <div style="min-height: 10em; width: 10em; background: url('{{ relative_images_path() . '/' . $category->thumb }}') center no-repeat;"></div>
+                                    <div style="min-height: 10em; width: 10em; background: url('<?php print(categories_images_dir . '/'. $category->id . '/' . $category->thumb); ?>') center no-repeat;"></div>
 
                                     <div class="panel">
-                                        <h5><?php print($category->retreive('name')); ?></h5>
+                                        <h5><?php print($category->name); ?></h5>
                                     </div>
                                 </a>
                             </div>
@@ -168,7 +181,37 @@ endif;
         </div>
     </div>
 </footer>
-	</div>
+</div>
 
+<script src="/js/vendor/jquery.js"></script>
+<script src="/js/foundation.min.js"></script>
+<script src="/js/foundation.topbar.js"></script>
+<script>
+$(document).foundation();
+$(document).ready(function() {
+    $('.div-search').on('click','a.search' ,function() {
+        var value = $('.input-search').val();
+        if(value == '')
+        {
+            alert('Nothing to search please put in a word')
+        }
+        else {
+                $.ajax({
+                url: '/ajax/searchproduct/' + value,
+                method: "get",
+                dataType: 'json',
+                success: function (data) {
+                    if(data.found ==1) {
+                        window.location.replace("{{url('resultspage')}}");
+                    }
+                    else{
+                        alert(data.nothing);
+                    }
+                }
+            })
+        }
+    })
+});
+</script>
 </body>
 </html>

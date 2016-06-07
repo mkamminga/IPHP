@@ -19,8 +19,8 @@
     $messages->errorClass('alert-box alert');
     ?>
 	<< show('content', '')
-	<< show('scripts', '')
 </div>
 
+<< show('scripts', '')
 </body>
 </html>

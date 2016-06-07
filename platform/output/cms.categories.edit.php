@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-	<title>Nieuwe categorie</title>	
+	<title>Categorie bewerken</title>	
 	<meta charset="UTF-8">
 	    
         <link rel="stylesheet" href="/css/foundation.min.css" />
@@ -37,7 +37,7 @@
                         <li><a href="<?php print($url->route('Dashboard')); ?>">Dashboard</a></li>
                         <li><a href="<?php print($url->route('NavigationOverview')); ?>">Navigatie</a></li>
                         <li><a href="{{ URL::route('beheer.orders.index') }}">Orders</a></li>
-                        <li><a href="{{ URL::route('beheer.products.index') }}">Products</a></li>
+                        <li><a href="<?php print($url->route('ProductsOverview')); ?>">Products</a></li>
                         <li><a href="<?php print($url->route('CategoriesOverview')); ?>">Categories</a></li>
                         <li><a href="{{ URL::route('beheer.users.index') }}">Gebruikers</a></li>
                     </ul>
@@ -45,7 +45,7 @@
             </div>
             
             <div class="large-9 columns">    
-                <h2> Nieuwe categorie</h2>
+                <h2> Categorie bewerken</h2>
                 <div class="content">
                     <?php if (!isset($parents) || $parents != $__view->getInjectedVar("parents")){$parents=$__view->getInjectedVar("parents");}if (!isset($category) || $category != $__view->getInjectedVar("category")){$category=$__view->getInjectedVar("category");}if (!isset($errors) || $errors != $__view->getInjectedVar("errors")){$errors=$__view->getInjectedVar("errors");} ?>
 			    <?php
@@ -86,7 +86,7 @@
 		
 		<div class="row">
 			<div class="large-12 columns">
-				<button type="submit" role="button" aria-label="submit form" class="button">Verstuur</button>
+				<button type="submit" role="button" aria-label="submit form" class="button">Bewerk</button>
 			</div>
 		</div>
 	</form>
@@ -119,7 +119,11 @@
             </div>
         </footer>
     </div>    
-	</div>
-
+</div>
+<script src="/js/vendor/jquery.js"></script>
+<script src="/js/foundation.min.js"></script>
+<script>
+$(document).foundation();
+</script>
 </body>
 </html>

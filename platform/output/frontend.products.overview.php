@@ -1,9 +1,22 @@
->> parent('layout::main.layout.php')
->> section('content')
-    >> uses menus
-    >> uses breadcrumbs
-    >> uses userGuard
-<div style="background-color: white">
+<!doctype html>
+<html>
+<head>
+	<title><?php if (!isset($title) || $title != $__view->getInjectedVar("title")){$title=$__view->getInjectedVar("title");} ?><?php print($title); ?></title>	
+	<meta charset="UTF-8">
+	    
+        <link rel="stylesheet" href="/css/foundation.min.css" />
+        <link rel="stylesheet" href="/css/main.css" />
+        <link rel="stylesheet" href="/css/foundation-icons.css" />
+        <script src="/js/vendor/modernizr.js"></script>
+</head>
+<body>
+<div id="main">
+    <?php
+    $messages = $this->service('htmlMessages');
+    $messages->errorClass('alert-box alert');
+    ?>
+	<?php if (!isset($menus) || $menus != $__view->getInjectedVar("menus")){$menus=$__view->getInjectedVar("menus");}if (!isset($breadcrumbs) || $breadcrumbs != $__view->getInjectedVar("breadcrumbs")){$breadcrumbs=$__view->getInjectedVar("breadcrumbs");}if (!isset($userGuard) || $userGuard != $__view->getInjectedVar("userGuard")){$userGuard=$__view->getInjectedVar("userGuard");} ?>
+            <div style="background-color: white">
     <div class="large-2 small-6 columns">
         <img src="/images/logo.png" style="width:100px;height:75px;">
     </div>
@@ -110,10 +123,45 @@
     endif;
     ?>
     <div style="clear: both"></div>
-</div>
+</div><?php if (!isset($category) || $category != $__view->getInjectedVar("category")){$category=$__view->getInjectedVar("category");}if (!isset($title) || $title != $__view->getInjectedVar("title")){$title=$__view->getInjectedVar("title");}if (!isset($products) || $products != $__view->getInjectedVar("products")){$products=$__view->getInjectedVar("products");} ?>
+                <?php
+    $url = $this->service('url');
+    ?>
+    <div class="row">
+        <h1>Products from: <?php print($category->retreive('name')) ?></h1>
+        <div class="large-12 columns">
+            <div class="row">
+                <div class="large-8 columns">
+                    <div class="row" data-equalizer>
+                        <?php
+                        $subCategoryId = $category->retreive('id');
+                        $mainCategoryId = $category->retreive('Parent_id');
+                        foreach ($products as $product):
+                            $id = $product->id;
+                            
+                            $categoryUrl = $url->route('ProductItem', [
+                                'category_id' => $mainCategoryId,
+                                'sub_category_id' => $subCategoryId,
+                                'product_id' => $id
+                            ]);
+                        ?>
+                            <div class="large-4 small-6 columns" id="<?php print($id) ?>" data-equalizer-watch>
+                                <a href="<?php print($categoryUrl) ?>">
+                                    <div style="min-height: 10em; width: 10em; background: url('<?php print(product_images_dir . '/'. $id . '/' . $product->small_image_link); ?>') center no-repeat;"></div>
 
-<< show('fcontent', '')
-
+                                    <div class="panel">
+                                        <h5><?php print($product->name); ?></h5>
+                                    </div>
+                                </a>
+                            </div>
+                        <?php
+                        endforeach
+                        ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 <footer class="row">
     <div class="large-12 columns"><hr/>
         <div class="panel">
@@ -142,15 +190,37 @@
         </div>
     </div>
 </footer>
-<< section('content')
-
->> section('scripts')
+</div>
 
 <script src="/js/vendor/jquery.js"></script>
 <script src="/js/foundation.min.js"></script>
 <script src="/js/foundation.topbar.js"></script>
 <script>
 $(document).foundation();
+$(document).ready(function() {
+    $('.div-search').on('click','a.search' ,function() {
+        var value = $('.input-search').val();
+        if(value == '')
+        {
+            alert('Nothing to search please put in a word')
+        }
+        else {
+                $.ajax({
+                url: '/ajax/searchproduct/' + value,
+                method: "get",
+                dataType: 'json',
+                success: function (data) {
+                    if(data.found ==1) {
+                        window.location.replace("{{url('resultspage')}}");
+                    }
+                    else{
+                        alert(data.nothing);
+                    }
+                }
+            })
+        }
+    })
+});
 </script>
-<< section('scripts')
-
+</body>
+</html>

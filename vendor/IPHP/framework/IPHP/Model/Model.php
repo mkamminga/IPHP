@@ -268,7 +268,7 @@ class Model {
 	}
 
 	public function contents () {
-		return (array)$this->fields;
+		return $this->fields;
 	}
 
 	public function with (...$methods) {

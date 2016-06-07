@@ -53,10 +53,10 @@
             foreach ($items as $menu):
                 $params = isset($menu->params) ? $menu->params : [];
                 $subMenu = isset($menu->subMenu) ? $menu->subMenu : [];
-                $output.= chr(9) . chr(9) .  '<li>'. chr(13) . chr(9). chr(9) . chr(9).  chr(9) . '<a href="'. $url->route($menu->link, $params) .'">'. $menu->name .'</a>' . chr(13) . chr(9) . chr(9);
+                $output.= chr(9) . chr(9) .  '<li'. (count($subMenu) > 0 ? ' class="has-dropdown"': '') .'>'. chr(13) . chr(9). chr(9) . chr(9).  chr(9) . '<a href="'. $url->route($menu->link, $params) .'">'. $menu->name .'</a>' . chr(13) . chr(9) . chr(9);
                 
                 if (count($subMenu) > 0) {
-                    $output.= chr(9) . chr(9) . $displayMenu($subMenu, 'submenu') . chr(9);
+                    $output.= chr(9) . chr(9) . $displayMenu($subMenu, 'dropdown') . chr(9);
                 }
                 
                 $output.=  chr(9) . '</li>'.chr(13) . chr(9);
@@ -102,16 +102,19 @@
     </nav>
 </div>
 
-<div class="breadcrumbs">
+<div class="breadcrumb-frame">
 <?php
 if (isset($breadcrumbs)):
 ?>
-<ul class="right">
+<ul class="right breadcrumbs">
 <?php
+    $num = count($breadcrumbs);
+    $i = 1;
     foreach ((array)$breadcrumbs as $breadcrumb):
 ?>
-    <li><a href="<?php print($breadcrumb->getUrl()); ?>"><?php print($breadcrumb->getTitle()); ?></a></li>
+    <li<?php print($i == $num ? ' class="current"' : ''); ?>><a href="<?php print($breadcrumb->getUrl()); ?>"><?php print($breadcrumb->getTitle()); ?></a></li>
 <?php
+        $i++;
     endforeach;
 ?>
 </ul>
@@ -119,10 +122,11 @@ if (isset($breadcrumbs)):
 endif;
 ?>
 </div>
+<div class="row">
     <h1>Home</h1>
 
     <p>Welkom in de geweldige webshop van goldfingers!!!</p>
-
+</div>
 <footer class="row">
     <div class="large-12 columns"><hr/>
         <div class="panel">
@@ -151,7 +155,37 @@ endif;
         </div>
     </div>
 </footer>
-	</div>
+</div>
 
+<script src="/js/vendor/jquery.js"></script>
+<script src="/js/foundation.min.js"></script>
+<script src="/js/foundation.topbar.js"></script>
+<script>
+$(document).foundation();
+$(document).ready(function() {
+    $('.div-search').on('click','a.search' ,function() {
+        var value = $('.input-search').val();
+        if(value == '')
+        {
+            alert('Nothing to search please put in a word')
+        }
+        else {
+                $.ajax({
+                url: '/ajax/searchproduct/' + value,
+                method: "get",
+                dataType: 'json',
+                success: function (data) {
+                    if(data.found ==1) {
+                        window.location.replace("{{url('resultspage')}}");
+                    }
+                    else{
+                        alert(data.nothing);
+                    }
+                }
+            })
+        }
+    })
+});
+</script>
 </body>
 </html>

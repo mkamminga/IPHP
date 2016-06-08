@@ -36,20 +36,13 @@ class ProductsController extends Controller
     public function showProduct (int $category_id, int $sub_category_id, int $product_id) {
         $category   = (new Category)->findOrFail($sub_category_id);
         if ($this->verifySubCategory($category_id, $category)){
-            $product   = (new Product)->findOrFail($product_id);
+            $product   = (new Product)->with('vat')->findOrFail($product_id);
             
             return $this->view('frontend::products::item.php', [
                 'category' => $category,
                 'product' => $product->contents(),
             ]);
         }
-    }
-
-
-    public function ajax($id)
-    {
-        $product = Product::findOrFail($id);
-        return response()->json(['product'=>$product]);
     }
 
     public function searchProduct(Request $request, $value)

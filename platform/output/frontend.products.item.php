@@ -15,8 +15,11 @@
     $messages = $this->service('htmlMessages');
     $messages->errorClass('alert-box alert');
     ?>
-	<?php if (!isset($menus) || $menus != $__view->getInjectedVar("menus")){$menus=$__view->getInjectedVar("menus");}if (!isset($breadcrumbs) || $breadcrumbs != $__view->getInjectedVar("breadcrumbs")){$breadcrumbs=$__view->getInjectedVar("breadcrumbs");}if (!isset($userGuard) || $userGuard != $__view->getInjectedVar("userGuard")){$userGuard=$__view->getInjectedVar("userGuard");} ?>
-            <div style="background-color: white">
+	<?php if (!isset($menus) || $menus != $__view->getInjectedVar("menus")){$menus=$__view->getInjectedVar("menus");}if (!isset($breadcrumbs) || $breadcrumbs != $__view->getInjectedVar("breadcrumbs")){$breadcrumbs=$__view->getInjectedVar("breadcrumbs");}if (!isset($userGuard) || $userGuard != $__view->getInjectedVar("userGuard")){$userGuard=$__view->getInjectedVar("userGuard");}if (!isset($cartCount) || $cartCount != $__view->getInjectedVar("cartCount")){$cartCount=$__view->getInjectedVar("cartCount");} ?>
+                <?php
+$url = $this->service('url');
+?>
+<div style="background-color: white">
     <div class="large-2 small-6 columns">
         <img src="/images/logo.png" style="width:100px;height:75px;">
     </div>
@@ -26,9 +29,9 @@
             <h1 style="color: #ffcc00">Goldenfingers</h1>
         </div>
         <div class="large-3 columns">
-            <a href="/shoppingcart">
+            <a href="<?php print($url->route('CartOverview')); ?>">
                 <div class="panel callout radius">
-                    <h6 class="li-cart">{{ $pCount }} items in your cart</h6>
+                    <h6 class="li-cart"><strong id="cart-count"><?php print($cartCount); ?></strong> producten in winkelwagen!</h6>
                 </div>
             </a>
         </div>
@@ -37,76 +40,75 @@
     <nav class="top-bar" data-topbar role="navigation">
         <ul class="title-area">
             <li class="name">
-                <h1><a href="{{url('categories')}}">GoldenFingers</a></h1>
+                <h1><a href="/">GoldenFingers</a></h1>
             </li>
         
             <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
         </ul>
 
         <section class="top-bar-section">
-        <!-- Left Nav Section -->
-        <?php
-        $url = $this->service('url');
-        
-        $displayMenu = function (array $items, $class = '') use($url, &$displayMenu) {
-            $output =   '<ul class="'. $class .'">' . chr(13) . chr(9);
-            foreach ($items as $menu):
-                $params = isset($menu->params) ? $menu->params : [];
-                $subMenu = isset($menu->subMenu) ? $menu->subMenu : [];
-                $output.= chr(9) . chr(9) .  '<li'. (count($subMenu) > 0 ? ' class="has-dropdown"': '') .'>'. chr(13) . chr(9). chr(9) . chr(9).  chr(9) . '<a href="'. $url->route($menu->link, $params) .'">'. $menu->name .'</a>' . chr(13) . chr(9) . chr(9);
-                
-                if (count($subMenu) > 0) {
-                    $output.= chr(9) . chr(9) . $displayMenu($subMenu, 'dropdown') . chr(9);
-                }
-                
-                $output.=  chr(9) . '</li>'.chr(13) . chr(9);
-            endforeach;
-            
-            $output.= chr(9) . '</ul>' . chr(13) . chr(9);
-            
-            return $output;
-       
-        };
-        
-        print($displayMenu($menus, 'left'));     
-        ?>
-        <!-- Right Nav Section -->
-        <ul class="right">
+            <!-- Left Nav Section -->
             <?php
-            if (!$userGuard->loggedIn()):
+            $displayMenu = function (array $items, $class = '') use($url, &$displayMenu) {
+                $output =   '<ul class="'. $class .'">' . chr(13) . chr(9);
+                foreach ($items as $menu):
+                    $params = isset($menu->params) ? $menu->params : [];
+                    $subMenu = isset($menu->subMenu) ? $menu->subMenu : [];
+                    $output.= chr(9) . chr(9) .  '<li'. (count($subMenu) > 0 ? ' class="has-dropdown"': '') .'>'. chr(13) . chr(9). chr(9) . chr(9).  chr(9) . '<a href="'. $url->route($menu->link, $params) .'">'. $menu->name .'</a>' . chr(13) . chr(9) . chr(9);
+                    
+                    if (count($subMenu) > 0) {
+                        $output.= chr(9) . chr(9) . $displayMenu($subMenu, 'dropdown') . chr(9);
+                    }
+                    
+                    $output.=  chr(9) . '</li>'.chr(13) . chr(9);
+                endforeach;
+                
+                $output.= chr(9) . '</ul>' . chr(13) . chr(9);
+                
+                return $output;
+        
+            };
+            
+            print($displayMenu($menus, 'left'));     
             ?>
-                <li>
-                    <a href="/login">Log in</a>
+            <!-- Right Nav Section -->
+            <ul class="right">
+                <?php
+                if (!$userGuard->loggedIn()):
+                ?>
+                    <li>
+                        <a href="/login">Log in</a>
+                    </li>
+                <?php
+                else:
+                ?>
+                    <li><a href="#">Welkom: <?php print($userGuard->getUsername()); ?></a></li> 
+                    <li><a href="/logout">Log out</a></li>
+                <?php
+                endif;
+                ?>
+                <li class="has-form">
+                    <div class="row collapse div-search">
+                        <div class="large-8 small-9 columns">
+                            <input class="input-search" type="text" placeholder="Products">
+                        </div>
+                        <div class="large-4 small-3 columns">
+                            <a href="#" class="alert button expand search">Search</a>
+                        </div>
+                    </div>
                 </li>
-            <?php
-            else:
-            ?>
-                <li><a href="#">Welkom: <?php print($userGuard->getUsername()); ?></a></li> 
-                <li><a href="/logout">Log out</a></li>
-            <?php
-            endif;
-            ?>
-            <li class="has-form">
-                <div class="row collapse div-search">
-                    <div class="large-8 small-9 columns">
-                        <input class="input-search" type="text" placeholder="Products">
-                    </div>
-                    <div class="large-4 small-3 columns">
-                        <a href="#" class="alert button expand search">Search</a>
-                    </div>
-                </div>
-            </li>
-        </ul>-->
-
+            </ul>
         </section>
     </nav>
 </div>
 
-<div class="breadcrumb-frame">
+<?php
+//display breadcrumbs
+if (isset($breadcrumbs) && !empty($breadcrumbs)):
+?>
+<div class="breadcrumb-frame clearfix">
 
-    <?php
-    if (isset($breadcrumbs)):
-    ?>
+
     <ul class="breadcrumbs right">
         <?php
             $num = count($breadcrumbs);
@@ -119,11 +121,10 @@
         endforeach;
         ?>
     </ul>
-    <?php
-    endif;
-    ?>
-    <div style="clear: both"></div>
-</div><?php if (!isset($product) || $product != $__view->getInjectedVar("product")){$product=$__view->getInjectedVar("product");}if (!isset($title) || $title != $__view->getInjectedVar("title")){$title=$__view->getInjectedVar("title");} ?>
+</div>
+<?php
+endif;
+?><?php if (!isset($product) || $product != $__view->getInjectedVar("product")){$product=$__view->getInjectedVar("product");}if (!isset($title) || $title != $__view->getInjectedVar("title")){$title=$__view->getInjectedVar("title");} ?>
             <?php
     $url = $this->service('url');
     $id = $product->id;
@@ -134,14 +135,15 @@
             <div class="row">
                 <div class="large-8 columns">
                     <div class="row" >
-                        <div class="large-4 small-6 columns">
-                            <div style="min-height: 10em; width: 10em; background: url('<?php print(product_images_dir . '/'. $id . '/' . $product->small_image_link); ?>') center no-repeat;"></div>
-
-                            <div class="panel">
-                                <h5><?php print($product->name); ?></h5>
-                            </div>
-                        </div>
                         
+                        <div style="min-height: 20em; width: 30em; background: url('<?php print(product_images_dir . '/'. $id . '/' . $product->small_image_link); ?>') center no-repeat;"></div>
+                            <h3><?php print($product->name); ?></h3>
+                            <p><?php print($product->detail); ?></p>
+                            <hr />
+                            <p>
+                                <strong>&euro; <?php print(number_format($product->price, 2, ',', '.')); ?></strong> (incl. <?php print($product->vat->rate); ?>% btw)
+                            </p>
+                            <button type="button" class="small add-product-to-cart" data-id="<?php print($product->id); ?>">Voeg toe aan winkelmand!</button>
                     </div>
                 </div>
             </div>
@@ -176,12 +178,31 @@
     </div>
 </footer>
 </div>
-
+<?php
+$url = $this->service('url');
+?>
 <script src="/js/vendor/jquery.js"></script>
 <script src="/js/foundation.min.js"></script>
 <script src="/js/foundation.topbar.js"></script>
 <script>
 $(document).foundation();
+
+$(".add-product-to-cart").click(function () {
+    var url = '<?php print($url->route('CartItemPost')); ?>';
+    var params={"id" : $(this).data('id'), "quantity" : 1};
+    $.post(url, params, function (result) {
+        if (result) {
+            if (result.status == "success") {
+                updateCartCount(result.data.count);
+            }
+        }
+    }, 'json');
+});
+
+function updateCartCount (num) {
+    console.log("Update to: "+ num);
+    $("#cart-count").html(num);
+}
 </script>
 </body>
 </html>

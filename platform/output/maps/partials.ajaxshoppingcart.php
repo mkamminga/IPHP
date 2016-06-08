@@ -1,0 +1,1 @@
+<?php $map=[];$map["/Applications/MAMP/htdocs/school webs/web2/platform/views/partials/ajaxshoppingcart.php"] = 1465376285;$map["/Applications/MAMP/htdocs/school webs/web2/platform/views/partials/shoppingcart.php"] = 1465377225;return $map;

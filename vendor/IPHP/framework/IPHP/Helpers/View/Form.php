@@ -58,7 +58,7 @@ class Form {
 					$output.= ' selected="selected"';
 				}
 
-				$output.='>'. $value .'</option>' . chr(13);
+				$output.='>'. htmlentities($value, ENT_HTML5, "ISO-8859-15") .'</option>' . chr(13);
 			}
 		}
 

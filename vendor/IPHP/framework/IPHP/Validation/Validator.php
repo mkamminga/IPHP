@@ -129,9 +129,7 @@ class Validator {
 	}
 
 	private function validateEmail (RequestInput $email):bool {
-		//
-		//
-		return false;
+		return filter_var($email->getValue(), FILTER_VALIDATE_EMAIL);
 	}
 
 	private function validateAlphaNum (RequestInput $data):bool {

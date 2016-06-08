@@ -268,7 +268,20 @@ class Model {
 	}
 
 	public function contents () {
-		return $this->fields;
+		$data = $this->fields;
+
+		if (!empty($this->related)) {
+			foreach ($this->related as $key => $model) {
+				if (!isset($data->{$key})) {
+					$data->{$key} = $model->contents();
+				} else {
+					$newKey = 'related_' . $key; 
+					$data->{$newKey} = $model->contents();
+				}
+			}
+		}
+
+		return $data;
 	}
 
 	public function with (...$methods) {

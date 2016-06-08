@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-	<title>login</title>	
+	<title>Winkelmandje</title>	
 	<meta charset="UTF-8">
 	    
         <link rel="stylesheet" href="/css/foundation.min.css" />
@@ -124,12 +124,91 @@ if (isset($breadcrumbs) && !empty($breadcrumbs)):
 </div>
 <?php
 endif;
+?><?php if (!isset($shoppingcart) || $shoppingcart != $__view->getInjectedVar("shoppingcart")){$shoppingcart=$__view->getInjectedVar("shoppingcart");}if (!isset($shoppingcart) || $shoppingcart != $__view->getInjectedVar("shoppingcart")){$shoppingcart=$__view->getInjectedVar("shoppingcart");} ?>
+        <?php
+    $url = $this->service('url');
+    ?>
+    <div class="row">
+        <div class="large-12 columns">
+            <div class="row">
+                <div id="cart-frame">
+                    <h2 class="h2-state">Cart</h2>
+<?php
+if (count($shoppingcart) > 0):
 ?>
-<div class="row">
-    <h1>Home</h1>
+<form method="post" action="" onsubmit="return false">
+    <table class="t-shoppingcart">
+        <thead>
+        <tr>
+            <th>Image</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Subtotal</th>
+            <th>Acties</th>
+        </tr>
+        </thead>
 
-    <p>Welkom in de geweldige webshop van goldfingers!!!</p>
-</div>
+        <tbody class="tb-cart">
+        <?php
+        $items = $shoppingcart->getItems();
+        foreach($items as $item):
+            $product = $item->getProduct()->contents();
+        ?>
+            <tr data-id="<?php print($product->id); ?>" class="cart-row-item">
+                <td>
+                    <a class="th" href="#"><img style="max-height: 80px; max-width: 80px;" src="<?php print(product_images_dir . '/'. $product->id . '/' . $product->small_image_link); ?>"></a>
+                </td>
+
+                <td>
+                    <?php print($product->name); ?>
+                </td>
+
+                <td class="td-quantity">
+                    <input type="text" name="quantityof_<?php print($product->id); ?>" data-id="<?php print($product->id); ?>" value="<?php print($item->getQuantity()); ?>" class="cart-item-quantity small" style="width: 3em;" />
+                </td>
+
+                <td>
+                    &euro; <?php print(number_format($product->price, 2, ',', '.')); ?>
+                </td>
+
+                <td>  &euro; <?php print(number_format($item->total(), 2, ',', '.')); ?></td>
+
+                <td>
+                    <a href="#"><i class="fi-x remove-item" data-id="<?php print($product->id) ?>"></i></a>
+                </td>
+                
+            </tr>
+        <?php
+        endforeach;
+        ?>
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <td colspan="4" class="text-right"><strong>Totalprice</strong></td>
+                <td colspan="2">&euro; <?php print(number_format($shoppingcart->getTotal(), 2, ',', '.')); ?></td>
+            </tr>
+        </tfoot>
+    </table>
+</form>
+<?php
+endif;
+?>
+                </div>    
+                
+                <div class="checkout">
+                    <?php
+                    if (count($shoppingcart) > 0):
+                    ?>
+                        <a href="<?php print($url->route('CheckoutShow')); ?>" class="button bt-checkout">Check out</a>
+                    <?php
+                    endif;
+                    ?>
+                </div>
+            </div>
+        </div>
+    </div>
 <footer class="row">
     <div class="large-12 columns"><hr/>
         <div class="panel">
@@ -159,6 +238,7 @@ endif;
     </div>
 </footer>
 </div>
+    
 <?php
 $url = $this->service('url');
 ?>
@@ -185,5 +265,47 @@ function updateCartCount (num) {
     $("#cart-count").html(num);
 }
 </script>
+    <script>
+        $(document).ready(function(){
+            $(document).on('click','.tb-cart i.remove-item' ,function(){
+                var id = $(this).data('id');
+                var url = '<?php print($url->route('CartItemRemove')); ?>';
+                var params={"id" : $(this).data('id'), "quantity" : 1};
+
+                $.post(url, params, function(result) {
+                    if (result){
+                        if (result.status == 'success'){
+                            updateCartCount(result.data.count);
+                            loadCart();
+                        }
+                    }
+                }, 'json');
+            });
+            //Update cart quantity
+            $(document).on('change','.tb-cart .cart-item-quantity' ,function(){
+                var quantity = parseInt($(this).val());
+                var id = $(this).data('id');
+                var url = '<?php print($url->route('CartItemQuantityUpdate')); ?>';
+                var params={"id" : id, "quantity" : quantity};
+
+                if (quantity >= 1) {
+                    $.post(url, params, function(result) {
+                        if (result){
+                            if (result.status == 'success'){
+                                updateCartCount(result.data.count);
+                                //reload cart
+                                loadCart();
+                            }
+                        }
+                    }, 'json');
+                }
+            });
+        });
+
+        function loadCart () {
+            var url = '<?php print($url->route('CartShowAjaxCart')); ?>';
+            $("#cart-frame").load(url);
+        }
+    </script>
 </body>
 </html>

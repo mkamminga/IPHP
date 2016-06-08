@@ -47,6 +47,9 @@ class HttpKernel extends Kernel {
 		try {
 			//Apply filters first, now that a route match has been found
 			$this->applyRouteFilters();
+
+			//Pre dispatch events
+			$this->app->getService('eventManager')->publish('route.pre.dispatch');
 			//Now continue and attempt to create the controller 
 			$route = $routeMatch->getRoute();
 			$instanciableController = $route->getController();
@@ -59,6 +62,7 @@ class HttpKernel extends Kernel {
 
 			if ($viewResponse && $viewResponse instanceof ViewResponse) {
 				$this->app->registerInstanceAlias('viewResponse', ViewResponse::class, $viewResponse);
+				//dispatched events
 				$this->app->getService('eventManager')->publish('route.dispatch');
 				$this->finnish($viewResponse);
 			}			

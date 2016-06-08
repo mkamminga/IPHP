@@ -20,13 +20,23 @@ class BreadcrumbResolver {
 		foreach ($this->breadcrumbs as $breadcrumb) {
 			if ($breadcrumb->getName() == $routeName) {
 				return $breadcrumb;
-			} else if ($breadcrumb->getChild()) {
-				$current = $breadcrumb->getChild();
-				while ($current) {
-					if ($current->getName() == $routeName) {
-						return $current;
+			} else if (!empty($breadcrumb->getChilds())) {
+				//breadth first search
+				$toVisit[] = $breadcrumb->getChilds();
+				$current = current($toVisit);
+				while (!empty($toVisit)) {
+					$current = current($toVisit);
+					foreach ($current as $child){
+						if ($child->getName() == $routeName) {
+							return $child;
+						}
+						
+						if (!empty($child->getChilds())){
+							$toVisit[] = $child->getChilds();
+						}
 					}
-					$current = $current->getChild();
+
+					unset($toVisit[key($toVisit)]);
 				}
 			}
 		}

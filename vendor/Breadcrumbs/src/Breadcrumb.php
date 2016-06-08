@@ -7,7 +7,7 @@ class Breadcrumb {
 	private $routeName = '';
 	private $title = '';
 	private $url = '';
-	private $child = NULL;
+	private $childs = [];
 	private $parent = NULL;
 	private $requiredParams = [];
 
@@ -21,16 +21,16 @@ class Breadcrumb {
 		return new self($routeName, $requiredParams,$resolver);
 	}
 
-	public function setChild (Breadcrumb $child) {
-		$this->child = $child;
+	public function addChild (Breadcrumb $child):Breadcrumb {
+		$this->childs[] = $child;
 
 		$child->setParent($this);
 
 		return $this;
 	}
 
-	public function getChild () {
-		return $this->child;
+	public function getChilds ():array {
+		return $this->childs;
 	}
 
 	public function setParent (Breadcrumb $parent) {

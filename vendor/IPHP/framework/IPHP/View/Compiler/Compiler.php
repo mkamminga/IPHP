@@ -65,6 +65,15 @@ class Compiler {
 
 			$time = filemtime($path);
 			$cacheMap[$path] = $time;
+			
+			$partials = $currentView->getPartials();
+
+			if (!empty($partials)) {
+				foreach ($partials as $partialPath) {
+					$time = filemtime($partialPath);
+					$cacheMap[$partialPath] = $time;
+				}
+			}
 			$currentView = $currentView->getParent();
 		}
 		$output = '';
@@ -80,7 +89,7 @@ class Compiler {
 
 		return $output;
 	}
-
+	
 	private function resolveParent(ViewParser $currentView): ViewParser {
 
 		$currentView->parse();

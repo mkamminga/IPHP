@@ -9,6 +9,7 @@ class ViewParser extends AbstractShowParser {
 	private $parentView = NULL;
 	private $childView = NULL;
 	private $sections = [];
+	private $partials = [];
 	private $output = NULL;
 	private $basePath;
 
@@ -42,8 +43,27 @@ class ViewParser extends AbstractShowParser {
 		return $this->childView;
 	}
 
+	private function extractPartials ($data) {
+		$data =  preg_replace_callback('/[\n\r]*>>\s+partial\(\'([a-zA-Z0-9\:\.]+)\'\)+/s', function ($matches) {
+			$path = $this->basePath . str_replace("::", DIRECTORY_SEPARATOR, $matches[1]);
+
+			if (file_exists($path)) {
+				$this->partials[] = $path;
+
+				return file_get_contents($path);
+			}
+
+			return "<< File '". $path ."' not found >>";
+		}, $data);
+
+		return $data;
+	}
+
+	public function getPartials () {
+		return $this->partials;
+	}
+
 	private function extractSections ($data) {
-		// 
 		$data =  preg_replace_callback('/[\n\r]*>>\s+section\(\'([a-z]+)\'\,\s*\'(.*)\'\)[\n\r]*/', function ($matches) {
 			$this->sections[$matches[1]] = new SingleLineSection($matches[1], $matches[2]);
 			
@@ -93,7 +113,7 @@ class ViewParser extends AbstractShowParser {
 		$data = '';
 		if (file_exists($this->basePath . $this->fileName)) {
 			$data = file_get_contents($this->basePath . $this->fileName);
-		
+			$data = $this->extractPartials($data);
 			$data = $this->extractParent($data);
 			$data = $this->extractSections($data);
 			$data = $this->extractShows($data);

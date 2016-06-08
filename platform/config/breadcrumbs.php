@@ -4,26 +4,28 @@ use Breadcrumbs\Breadcrumb;
  * Breadcrumbs
  */
 return [
+	//Top level: Home
 	Breadcrumb::make('Home', [], function (Breadcrumb $breadcrumb, array $params = []) {
 		$breadcrumb->setTitle('Home');
-	})->setChild(
+	})->addChild(
+		//Categories: Main -> Sub -> Product
 		Breadcrumb::make('FrontendCategories', [], function (Breadcrumb $breadcrumb, array $params = []) {
 			$breadcrumb->setTitle('Categories');
-		})->setChild(
+		})->addChild(
 			Breadcrumb::make('SubcategoriesOverview', ['category_id'], function (Breadcrumb $breadcrumb, array $params) {
 				//Set the title of the current category
 				$category = new App\Category;
 				$category = $category->find($params['category_id']);
 
 				$breadcrumb->setTitle('Category : '. $category->retreive('name'));
-			})->setChild(
+			})->addChild(
 				Breadcrumb::make('CategoryProducts', ['category_id', 'sub_category_id'], function (Breadcrumb $breadcrumb, array $params) {
 					//Set the title of the current subcategory
 					$category = new App\Category;
 					$category = $category->find($params['sub_category_id']);
 
 					$breadcrumb->setTitle('SubCategory : '. $category->retreive('name'));
-				})->setChild(
+				})->addChild(
 					Breadcrumb::make('ProductItem', ['category_id', 'sub_category_id', 'product_id'], function (Breadcrumb $breadcrumb, array $params) {
 						//Set the title of the current product
 						$product = (new App\Product)->find($params['product_id']);
@@ -32,6 +34,21 @@ return [
 					})
 				)
 			)
+		)
+	)->addChild(
+		//Cart
+		Breadcrumb::make('CartOverview', [], function (Breadcrumb $breadcrumb, array $params) {
+			$breadcrumb->setTitle('Winkelwagen');
+		})->addChild(
+			//Checkout: get
+			Breadcrumb::make('CheckoutShow', [], function (Breadcrumb $breadcrumb, array $params) {
+				$breadcrumb->setTitle('Betaalgegevens');
+			})
+		)->addChild(
+			//Checkout: Post
+			Breadcrumb::make('CheckoutPost', [], function (Breadcrumb $breadcrumb, array $params) {
+				$breadcrumb->setTitle('Betaalgegevens');
+			})
 		)
 	)
 ];

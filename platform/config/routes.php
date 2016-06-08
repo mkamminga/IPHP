@@ -32,17 +32,31 @@ return [
 	],
 	'routes' => [
 		//Frontend
-		new RouteCollection('', [App\Filters\RegisterViewComposerFilter::class => []], [
+		new RouteCollection('', [App\Filters\CartFilter::class => [], App\Filters\RegisterViewComposerFilter::class => []], [
 			new Route('Home','/home?', 'get', App\Controllers\Frontend\HomeController::class, 'index'),
-			//categories
+			//categories/subcategories/product
 			(new Route('FrontendCategories','/categories', 'get', App\Controllers\Frontend\CategoriesController::class, 'showMainCategories'))->addCollection([
 				//Subcategories
 				(new Route('SubcategoriesOverview','/[num:category_id]/categories', 'get', App\Controllers\Frontend\CategoriesController::class, 'showSubcategories'))->addCollection([
 					//subcategiry products overview
 					(new Route('CategoryProducts', '/[num:sub_category_id]/products', 'get', App\Controllers\Frontend\ProductsController::class, 'showProducts'))->addCollection([
+						//product
 						new Route('ProductItem', '/[num:product_id]', 'get', App\Controllers\Frontend\ProductsController::class, 'showProduct')
 					])
 				])
+			]),
+			//cart - ajax actions
+			new Route('CartShowAjaxCart', '/cart-show-mini', 'get', App\Controllers\Frontend\ShoppingCartController::class, 'shoppingCart'),
+			new Route('CartItemPost', '/cart-add', 'post', App\Controllers\Frontend\ShoppingCartController::class, 'addProductToCart'),
+			new Route('CartItemQuantityUpdate', '/cart-update-quantity', 'post', App\Controllers\Frontend\ShoppingCartController::class, 'updateItemQuantity'),
+			new Route('CartItemRemove', '/cart-remove-item', 'post', App\Controllers\Frontend\ShoppingCartController::class, 'removeItem'),
+			
+			new RouteCollection('/bestelling-afronden', [], [
+				new Route('CartOverview', '/winkelwagen', 'get', App\Controllers\Frontend\ShoppingCartController::class, 'showCart'),
+				//checkout
+				new Route('CheckoutShow', '/bestelgegevens', 'get', App\Controllers\Frontend\OrdersController::class, 'showCheckout'),
+				new Route('CheckoutPost', '/bestelgegevens', 'post', App\Controllers\Frontend\OrdersController::class, 'postCheckout'),
+				new Route('CheckoutStatus', '/status', 'get', App\Controllers\Frontend\OrdersController::class, 'showStatus')
 			]),
 			//About,
 			new Route('About', '/about', 'get', App\Controllers\Frontend\HomeController::class, 'index'),

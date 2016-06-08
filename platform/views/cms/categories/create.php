@@ -5,10 +5,10 @@
 >> section('fcontent')
 	>> uses parents
 	>> uses errors
-    <?php
-    if (isset($errors)):
-    	print($this->service('htmlMessages')->errors($errors));
-    endif;
+	<?php
+	if (isset($errors)):
+		print($this->service('htmlMessages')->errors($errors));
+	endif;
 
   $form = $this->service('form');
 	$input = $this->service('input');

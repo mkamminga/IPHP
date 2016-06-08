@@ -27,4 +27,8 @@ class Product extends Model {
 	public function category () {
 		return new HasOne(new Category, 'Categories_id', 'id', 'category');
 	}
+
+	public function vat () {
+		return new HasOne(new VatRate, 'vat_rate_id', 'id', 'vat');
+	}
 }

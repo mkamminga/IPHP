@@ -14,14 +14,15 @@
             <div class="row">
                 <div class="large-8 columns">
                     <div class="row" >
-                        <div class="large-4 small-6 columns">
-                            <div style="min-height: 10em; width: 10em; background: url('<?php print(product_images_dir . '/'. $id . '/' . $product->small_image_link); ?>') center no-repeat;"></div>
-
-                            <div class="panel">
-                                <h5><?php print($product->name); ?></h5>
-                            </div>
-                        </div>
                         
+                        <div style="min-height: 20em; width: 30em; background: url('<?php print(product_images_dir . '/'. $id . '/' . $product->small_image_link); ?>') center no-repeat;"></div>
+                            <h3><?php print($product->name); ?></h3>
+                            <p><?php print($product->detail); ?></p>
+                            <hr />
+                            <p>
+                                <strong>&euro; <?php print(number_format($product->price, 2, ',', '.')); ?></strong> (incl. <?php print($product->vat->rate); ?>% btw)
+                            </p>
+                            <button type="button" class="small add-product-to-cart" data-id="<?php print($product->id); ?>">Voeg toe aan winkelmand!</button>
                     </div>
                 </div>
             </div>

@@ -116,6 +116,10 @@ class Validator {
 		$this->errors[$key] = $error;
 	}
 
+	public function hasErrors ():bool {
+		return !empty($this->errors);
+	}
+
 	private function validateRequired ($data):bool {
 		return ($data && $data instanceof RequestInput && !$data->isEmpty());
 	}

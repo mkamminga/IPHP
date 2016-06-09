@@ -12,8 +12,7 @@ if (count($shoppingcart) > 0):
             <th>Quantity</th>
             <th>Price</th>
             <th>Subtotal</th>
-            <th>Remove</th>
-            
+            <th>Acties</th>
         </tr>
         </thead>
 

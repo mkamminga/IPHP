@@ -44,17 +44,25 @@ class ProductsController extends Controller
             ]);
         }
     }
-
-    public function searchProduct(Request $request, $value)
+    /**
+     * Display a listing of products filtered by a search query
+     *
+     * @return Response
+     */
+    public function searchProduct(Request $request)
     {
-        $products = Product::withSearchable($value)->get();
-
-        if(count($products)<1 || $products ==null)
-        {
-            $nothing = 'No products found';
-            return response()->json(['nothing'=>$nothing,'found'=>0]);
+        $productModel = new Product;
+        if ($request->get('q') && !$request->get('q')->isEmpty()) {
+            $searchable = $productModel->searchable($request->get('q')->getValue());
+        } else {
+            $searchable = $productModel->select();
         }
 
+        $products = $productModel->with('category')->get($searchable->orderBy('name'));
+
+        return $this->view('frontend::products::search.php', [
+            'products' => $products
+        ]);
     }
 
     private function verifySubCategory (int $category_id, Category $category):bool {

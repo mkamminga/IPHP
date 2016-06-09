@@ -23,18 +23,20 @@ class CartSessionGuard {
         return $this->initialized;
     }
 
-    public function loadable ():bool {
-        return $this->sessionManager->get($this->sessionKey) != NULL;
+    public function loadable (string $key):bool {
+        return $this->sessionManager->get($key) != NULL;
     }
 
-    public function load ():bool {
-        $cartSession        = $this->sessionManager->get($this->sessionKey);
+    public function load (string $key):bool {
+        $cartSession        = $this->sessionManager->get($key);
         if (!is_array($cartSession)) {
             $cartSession = [];
         }
 
         if (!$this->initialized){
             $productModel = new Product;
+            $productModel->with('vat');
+
             foreach ($cartSession as $productId => $quantity) {
                 $product = $productModel->findOrFail((int)$productId);
                 $item = new CartItem($product, (int)$quantity);
@@ -48,7 +50,13 @@ class CartSessionGuard {
         return true;
     }
 
-    public function save ():bool {
+    public function reload (string $key): bool {
+        $this->initialized = false;
+
+        return $this->load($key);
+    } 
+
+    public function save (string $key):bool {
         if ($this->initialized){
             
             $items          = $this->cart->getItems();
@@ -60,11 +68,19 @@ class CartSessionGuard {
             
             $this->initialized  = false;
           
-            $this->sessionManager->set($this->sessionKey, $cartSession);
+            $this->sessionManager->set($key, $cartSession);
 
-            return false;
+            return true;
         } else {
             return false;
         }
+    }
+
+    public function reset (string $key) {
+        $this->sessionManager->set($key, []);
+    }
+
+    public function getKey () {
+        return $this->sessionKey;
     }
 }

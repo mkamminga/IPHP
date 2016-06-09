@@ -16,50 +16,37 @@
     $messages->errorClass('alert-box alert');
     ?>
 	<?php if (!isset($errors) || $errors != $__view->getInjectedVar("errors")){$errors=$__view->getInjectedVar("errors");} ?>
-    <div class="row">
+   		
+<div class="row">
     <div class="large-12 columns">
-
         <?php
-        if (isset($errors) && count((array)$errors) > 0):
-        ?>
-            <div data-alert="" class="alert-box alert">
-                <ul>
-                    <?php
-                    foreach ($errors as $error):
-                    ?>
-                        <li><?php print($error); ?></li>
-                    <?php
-                    endforeach;
-                    ?>
-                </ul>
-                
-            </div>
-        <?php
-        endif;
-        ?>
-        <h1>Login</h1>
-        <?php
-        $input = $this->service('input');
-        ?>
-        <hr />
-        <form method="POST" action="">
-            <div class="large-3 rows">
-                Username
-                <input type="text" name="username" value="<?php print($input->raw('username')) ?>">
-            </div>
+if (isset($errors)):
+    print($this->service('htmlMessages')->errors($errors));
+endif;
 
-            <div class="large-3 rows">
-                Password
-                <input type="password" name="password" id="password">
-            </div>
+$form = $this->service('form');
+$input = $this->service('input');
+?>
+<h1>Login</h1>
+<hr />
+<form method="POST" action="">
+    <div class="large-3 rows">
+        <label>Gebruikersnaam
+            <?php print($form->text('username', $input->raw('username'))) ?>
+        </label>
+    </div>
 
-            <div>
-                <button type="submit">Login</button>
-            </div>
-        </form>
+    <div class="large-3 rows">
+            <label>Wachtwoord
+            <?php print($form->password('password')) ?>
+        </label>
+    </div>
+
+    <div class="large-3 rows">
+        <button type="submit">Login</button>
+    </div>
+</form>
     </div>
 </div>  
-	</div>
-
-</body>
+</div></body>
 </html>

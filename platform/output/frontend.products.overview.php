@@ -89,12 +89,14 @@ $url = $this->service('url');
                 ?>
                 <li class="has-form">
                     <div class="row collapse div-search">
-                        <div class="large-8 small-9 columns">
-                            <input class="input-search" type="text" placeholder="Products">
-                        </div>
-                        <div class="large-4 small-3 columns">
-                            <a href="#" class="alert button expand search">Search</a>
-                        </div>
+                        <form action="<?php print($url->route('ProductSearch')); ?>" method="get">
+                            <div class="large-8 small-9 columns">
+                                <input name="q" type="text" placeholder="Products">
+                            </div>
+                            <div class="large-4 small-3 columns">
+                                <button type="submit" class="alert expand search">Search</button>
+                            </div>
+                        </form>
                     </div>
                 </li>
             </ul>
@@ -146,15 +148,14 @@ endif;
                                 'product_id' => $id
                             ]);
                         ?>
-                            <div class="large-4 small-6 columns" id="<?php print($id) ?>" data-equalizer-watch>
-                                <a href="<?php print($categoryUrl) ?>">
-                                    <div style="min-height: 10em; width: 10em; background: url('<?php print(product_images_dir . '/'. $id . '/' . $product->small_image_link); ?>') center no-repeat;"></div>
+                            <div class="large-4 small-6 columns" id="<?php print($id) ?>" data-equalizer-watch>    
+    <div style="min-height: 10em; width: 10em; background: url('<?php print(product_images_dir . '/'. $id . '/' . $product->small_image_link); ?>') center no-repeat;"></div>
 
-                                    <div class="panel">
-                                        <h5><?php print($product->name); ?></h5>
-                                    </div>
-                                </a>
-                            </div>
+    <div class="panel">
+        <a href="<?php print($categoryUrl) ?>"><h5><?php print($product->name); ?></h5></a>
+        <button type="button" class="tiny add-product-to-cart" data-id="<?php print($product->id); ?>">Voeg toe aan winkelwagen!</button>
+    </div>
+</div>
                         <?php
                         endforeach
                         ?>

@@ -36,8 +36,8 @@ class Form {
 		return $this->input('text', $name, $value, $attr);
 	}
 
-	public function password (string $name, $value, array $attr = []) {
-		return $this->input('password', $name, $value, $attr);
+	public function password (string $name, array $attr = []) {
+		return $this->input('password', $name, '', $attr);
 	}
 
 	public function select (string $name, array $values, $selected = '', array $attr = []) {

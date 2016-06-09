@@ -5,6 +5,7 @@
     >> uses errors
     >> uses order
     >> uses countries
+  <div class="row">
     <?php
     if (isset($errors)):
       print($this->service('htmlMessages')->errors($errors));
@@ -14,7 +15,7 @@
     $input = $this->service('input');
 	  $input->setModel($order);
     ?>
-<div class="row">
+
     <h1>Bestelgegevens</h1>
     <form action="" method="post">
         <div class='large-6 rows'>

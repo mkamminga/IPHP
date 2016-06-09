@@ -5,6 +5,10 @@ namespace App;
 class Cart {
     protected $cartItems = array();
 
+    public function reset () {
+        $this->cartItems = [];
+    }
+
     public function addItem (CartItem $cartItem) {
         $this->cartItems[] = $cartItem;
     }
@@ -23,7 +27,7 @@ class Cart {
 
     public function getItemByProduct (Product $product) {
         foreach ($this->cartItems as $item) {
-            if ($item->getProduct() == $product) {
+            if ($item->getProduct()->retreive('id') == $product->retreive('id')) {
                 return $item;
             }
         }

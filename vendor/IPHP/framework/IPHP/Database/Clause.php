@@ -83,6 +83,18 @@ class Clause extends Queriable {
 		return $this;
 	}
 
+	public function like ($field, $value, $andOr = 'AND') {
+		$this->append($andOr, $field . ' LIKE ?', [$value]);
+
+		return $this;
+	}
+
+	public function notLike ($field, $value, $andOr = 'AND') {
+		$this->append($andOr, $field . ' NOT LIKE ?', [$value]);
+
+		return $this;
+	}
+
 	public function clause (Clause $query, $andOr = 'AND') {
 		$appendData = $query->getComputedQuery();
 		if ($appendData){

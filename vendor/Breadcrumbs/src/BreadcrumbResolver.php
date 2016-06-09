@@ -18,7 +18,7 @@ class BreadcrumbResolver {
 
 	public function findByName ($routeName) {
 		foreach ($this->breadcrumbs as $breadcrumb) {
-			if ($breadcrumb->getName() == $routeName) {
+			if ($breadcrumb->match($routeName)) {
 				return $breadcrumb;
 			} else if (!empty($breadcrumb->getChilds())) {
 				//breadth first search
@@ -27,7 +27,7 @@ class BreadcrumbResolver {
 				while (!empty($toVisit)) {
 					$current = current($toVisit);
 					foreach ($current as $child){
-						if ($child->getName() == $routeName) {
+						if ($child->match($routeName)) {
 							return $child;
 						}
 						

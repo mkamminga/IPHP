@@ -45,6 +45,9 @@ return [
 					])
 				])
 			]),
+			//Searching
+			new Route('ProductSearch', '/zoeken', 'get', App\Controllers\Frontend\ProductsController::class, 'searchProduct'),
+
 			//cart - ajax actions
 			new Route('CartShowAjaxCart', '/cart-show-mini', 'get', App\Controllers\Frontend\ShoppingCartController::class, 'shoppingCart'),
 			new Route('CartItemPost', '/cart-add', 'post', App\Controllers\Frontend\ShoppingCartController::class, 'addProductToCart'),
@@ -56,7 +59,7 @@ return [
 				//checkout
 				new Route('CheckoutShow', '/bestelgegevens', 'get', App\Controllers\Frontend\OrdersController::class, 'showCheckout'),
 				new Route('CheckoutPost', '/bestelgegevens', 'post', App\Controllers\Frontend\OrdersController::class, 'postCheckout'),
-				new Route('CheckoutStatus', '/status', 'get', App\Controllers\Frontend\OrdersController::class, 'showStatus')
+				new Route('CheckoutStatus', '/geplaatst', 'get', App\Controllers\Frontend\OrdersController::class, 'showStatus')
 			]),
 			//About,
 			new Route('About', '/about', 'get', App\Controllers\Frontend\HomeController::class, 'index'),
@@ -67,7 +70,10 @@ return [
 			//Login
 			new Route('LoginGet','/login', 'get', App\Controllers\Frontend\LoginController::class, 'showLogin'),
 			new Route('LoginPost','/login', 'post', App\Controllers\Frontend\LoginController::class, 'postLogin'),
-			new Route('Logout','/logout', 'get', App\Controllers\Frontend\LoginController::class, 'logout')
+			new Route('Logout','/logout', 'get', App\Controllers\Frontend\LoginController::class, 'logout'),
+			//Registreer
+			new Route('RegisterGet','/registreer', 'get', App\Controllers\Frontend\RegisterController::class, 'showRegister'),
+			new Route('RegisterPost','/registreer', 'post', App\Controllers\Frontend\RegisterController::class, 'postRegister'),
 		]),
 
 		//CMS
@@ -87,7 +93,9 @@ return [
 					routeResource('Products', App\Controllers\Backend\ProductsController::class),
 					new Route('ProductsSubCategories', '/category/[num:id]/subcategories', 'get', App\Controllers\Backend\ProductsController::class, 'ajaxSubcategories')
 				)),
-				
+				//orders
+				new RouteCollection('/orders', [], routeResource('Orders', App\Controllers\Backend\OrdersController::class)),
+
 			])
 		])
 	]

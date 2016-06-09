@@ -89,12 +89,14 @@ $url = $this->service('url');
                 ?>
                 <li class="has-form">
                     <div class="row collapse div-search">
-                        <div class="large-8 small-9 columns">
-                            <input class="input-search" type="text" placeholder="Products">
-                        </div>
-                        <div class="large-4 small-3 columns">
-                            <a href="#" class="alert button expand search">Search</a>
-                        </div>
+                        <form action="<?php print($url->route('ProductSearch')); ?>" method="get">
+                            <div class="large-8 small-9 columns">
+                                <input name="q" type="text" placeholder="Products">
+                            </div>
+                            <div class="large-4 small-3 columns">
+                                <button type="submit" class="alert expand search">Search</button>
+                            </div>
+                        </form>
                     </div>
                 </li>
             </ul>

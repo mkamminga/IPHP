@@ -8,6 +8,7 @@ class Breadcrumb {
 	private $title = '';
 	private $url = '';
 	private $childs = [];
+	private $aliases = [];
 	private $parent = NULL;
 	private $requiredParams = [];
 
@@ -33,6 +34,12 @@ class Breadcrumb {
 		return $this->childs;
 	}
 
+	public function addAlias (string $routeName) {
+		$this->aliases[] = $routeName;
+
+		return $this;
+	}
+
 	public function setParent (Breadcrumb $parent) {
 		$this->parent = $parent;
 	}
@@ -51,6 +58,14 @@ class Breadcrumb {
 
 	public function getName () {
 		return $this->routeName;
+	}
+
+	public function match (string $routeName): bool {
+		if ($this->routeName == $routeName || (!empty($this->aliases) && in_array($routeName, $this->aliases))) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public function getRequiredParams (): array {

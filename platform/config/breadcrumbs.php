@@ -40,15 +40,25 @@ return [
 		Breadcrumb::make('CartOverview', [], function (Breadcrumb $breadcrumb, array $params) {
 			$breadcrumb->setTitle('Winkelwagen');
 		})->addChild(
-			//Checkout: get
+			//Checkout
 			Breadcrumb::make('CheckoutShow', [], function (Breadcrumb $breadcrumb, array $params) {
 				$breadcrumb->setTitle('Betaalgegevens');
-			})
-		)->addChild(
-			//Checkout: Post
-			Breadcrumb::make('CheckoutPost', [], function (Breadcrumb $breadcrumb, array $params) {
-				$breadcrumb->setTitle('Betaalgegevens');
-			})
+			})->addAlias('CheckoutPost')
 		)
+	)->addChild(
+		//Search
+		Breadcrumb::make('ProductSearch', [], function (Breadcrumb $breadcrumb, array $params) {
+			$breadcrumb->setTitle('Zoeken');
+		})
+	)->addChild(
+		//Login
+		Breadcrumb::make('LoginGet', [], function (Breadcrumb $breadcrumb, array $params) {
+			$breadcrumb->setTitle('Login');
+		})->addAlias('LoginPost')
+	)->addChild(
+		//Login
+		Breadcrumb::make('RegisterGet', [], function (Breadcrumb $breadcrumb, array $params) {
+			$breadcrumb->setTitle('Registreer');
+		})->addAlias('RegisterPost')
 	)
 ];

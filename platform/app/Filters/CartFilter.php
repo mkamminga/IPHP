@@ -23,7 +23,7 @@ class CartFilter implements IRouteFilterable {
             $cart       = new Cart;
             $cartGuard  = new CartSessionGuard($sm->getService('sessionManager'), $key, $cart);
 
-            $cartGuard->load();
+            $cartGuard->load($key);
             
 			$sm->registerInstanceAlias('cart', Cart::class, $cart);
             $sm->registerInstanceAlias('cartSessionGuard', CartSessionGuard::class, $cartGuard);

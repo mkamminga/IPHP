@@ -26,15 +26,7 @@
                                 'product_id' => $id
                             ]);
                         ?>
-                            <div class="large-4 small-6 columns" id="<?php print($id) ?>" data-equalizer-watch>
-                                <a href="<?php print($categoryUrl) ?>">
-                                    <div style="min-height: 10em; width: 10em; background: url('<?php print(product_images_dir . '/'. $id . '/' . $product->small_image_link); ?>') center no-repeat;"></div>
-
-                                    <div class="panel">
-                                        <h5><?php print($product->name); ?></h5>
-                                    </div>
-                                </a>
-                            </div>
+                            >> partial('partials::product.overview.item.php')
                         <?php
                         endforeach
                         ?>

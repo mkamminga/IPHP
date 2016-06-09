@@ -89,12 +89,14 @@ $url = $this->service('url');
                 ?>
                 <li class="has-form">
                     <div class="row collapse div-search">
-                        <div class="large-8 small-9 columns">
-                            <input class="input-search" type="text" placeholder="Products">
-                        </div>
-                        <div class="large-4 small-3 columns">
-                            <a href="#" class="alert button expand search">Search</a>
-                        </div>
+                        <form action="<?php print($url->route('ProductSearch')); ?>" method="get">
+                            <div class="large-8 small-9 columns">
+                                <input name="q" type="text" placeholder="Products">
+                            </div>
+                            <div class="large-4 small-3 columns">
+                                <button type="submit" class="alert expand search">Search</button>
+                            </div>
+                        </form>
                     </div>
                 </li>
             </ul>
@@ -125,7 +127,8 @@ if (isset($breadcrumbs) && !empty($breadcrumbs)):
 <?php
 endif;
 ?><?php if (!isset($errors) || $errors != $__view->getInjectedVar("errors")){$errors=$__view->getInjectedVar("errors");}if (!isset($order) || $order != $__view->getInjectedVar("order")){$order=$__view->getInjectedVar("order");}if (!isset($countries) || $countries != $__view->getInjectedVar("countries")){$countries=$__view->getInjectedVar("countries");} ?>
-                <?php
+              <div class="row">
+    <?php
     if (isset($errors)):
       print($this->service('htmlMessages')->errors($errors));
     endif;
@@ -134,7 +137,7 @@ endif;
     $input = $this->service('input');
 	  $input->setModel($order);
     ?>
-<div class="row">
+
     <h1>Bestelgegevens</h1>
     <form action="" method="post">
         <div class='large-6 rows'>

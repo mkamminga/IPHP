@@ -45,7 +45,7 @@ class ShoppingCartController extends Controller
             $cart->addItem(new CartItem($product, $quantity));
         }
         //save to the session
-        $guard->save();
+        $guard->save($guard->getKey());
     
         return $this->json([
             'status' => 'success',
@@ -104,7 +104,7 @@ class ShoppingCartController extends Controller
             ]);
         } else {
             $cartItem->updateQuantity((int)$request->get('quantity')->getValue());
-            $guard->save();
+            $guard->save($guard->getKey());
         }
 
         return $this->json([
@@ -120,6 +120,8 @@ class ShoppingCartController extends Controller
      * @return Response
      */
     public function shoppingCart (Cart $cart) {
-        return $this->view('partials::ajaxshoppingcart.php', ['shoppingcart' => $cart]);
+        return $this->view('partials::ajaxshoppingcart.php', [
+            'shoppingcart' => $cart
+        ]);
     }
 }

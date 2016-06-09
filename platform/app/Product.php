@@ -11,24 +11,32 @@ class Product extends Model {
 	protected $primaryKeys = ['id'];
 	protected $softDelete = true;
 	
-	public function all () {
+	public function all (): Selectable {
 		return $this->select();	
 	}
 	
-	public function withArtnr (Selectable $selectable, int $id) {
+	public function withArtnr (Selectable $selectable, int $id): Selectable {
 		return $selectable->where((new Where)->equals('artikelnr', $id));
 	}
 	
-	public function fromCategory (int $categoryId) {
+	public function fromCategory (int $categoryId): Selectable {
 		return $this->select()
 					->where((new Where)->equals('Categories_id', $categoryId));
 	}
 
-	public function category () {
+	public function searchable ($mixedValue): Selectable {
+		return $this->select()
+					->where(
+						(new Where)->like('name', '%'. $mixedValue .'%')
+									->like('short_description', '%'. $mixedValue .'%', 'OR')
+					);	
+	}
+
+	public function category (): HasOne {
 		return new HasOne(new Category, 'Categories_id', 'id', 'category');
 	}
 
-	public function vat () {
+	public function vat (): HasOne {
 		return new HasOne(new VatRate, 'vat_rate_id', 'id', 'vat');
 	}
 }

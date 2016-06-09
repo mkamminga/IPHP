@@ -13,7 +13,7 @@ class LoginController extends AuthController {
 			$this->redirect()->to('/');
 		}
 
-		return $this->view("login.php");
+		return $this->view("frontend::auth::login.php");
 	}
 
 	public function postLogin (Request $request, User $user, Validator $validator) {

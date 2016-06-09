@@ -24,4 +24,8 @@ class User extends Model {
 				 ->limit(1)
 		);
 	}
+
+	public function isUnique ($username):bool {
+		return empty($this->findByName($username));
+	}
 }

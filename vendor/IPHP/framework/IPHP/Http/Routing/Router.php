@@ -7,6 +7,7 @@ class Router {
 	private $registerdRoutes = [];
 	private $defaultNamedGroups = [];
 	private $filters = [];
+	private $exceptionRoute;
 	private $request;
 	private $routeMatch;
 	private $registeredNamedRoutes = [];
@@ -72,6 +73,7 @@ class Router {
 	 */
 	private function settingsFromConfig (array $settings) {
 		$this->defaultNamedGroups = $settings['defaults'];
+		$this->exceptionRoute = $settings['exceptions']['404'];
 	}
 	/**
 	 * [getNamedGroups description]
@@ -99,8 +101,8 @@ class Router {
 				}
 			}
 		}
-
-		return NULL;
+		//404 exception
+		return new RouteMatch($url, [], $this->exceptionRoute);
 	}
 	/**
 	 * [getRouteMatch description]

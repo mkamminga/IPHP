@@ -35,14 +35,20 @@ class Input {
 			return $data;
 		}
 
-		$data = utf8_encode($data);
+		if (function_exists('mb_detect_encoding') && function_exists('iconv')){
+			$encoding = mb_detect_encoding($data);
+
+			if ($encoding && $encoding != "UTF-8"){
+				$data = iconv($encoding, "UTF-8//IGNORE", $data);
+			}
+		} else if (function_exists('utf8_encode')) {
+			$data = utf8_encode($data);
+		}
+		
 		$result = preg_replace_callback('/[^a-z0-9,\.\-_]/iSu', function ($matches) {
 			$chr = $matches[0];
 	        $ord = ord($chr);
-	        /**
-	         * The following replaces characters undefined in HTML with the
-	         * hex entity for the Unicode replacement character.
-	         */
+			//replace unknown chars with nothing
 	        if (($ord <= 0x1f && $chr != "\t" && $chr != "\n" && $chr != "\r")
 	            || ($ord >= 0x7f && $ord <= 0x9f)
 	        ) {
@@ -53,10 +59,10 @@ class Input {
 	        $ord = hexdec($hex);
 
 			$allowed = [
-		        34 => 'quot',         // quotation mark
-		        38 => 'amp',          // ampersand
-		        60 => 'lt',           // less-than sign
-		        62 => 'gt',           // greater-than sign
+		        34 => 'quot',       
+		        38 => 'amp',          
+		        60 => 'lt',           
+		        62 => 'gt',           
 		    ];
 
 	        if (isset($allowed[$ord])) {

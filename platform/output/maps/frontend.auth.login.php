@@ -1,1 +1,0 @@
-<?php $map=[];$map["/var/www/html/webs2/platform/views/frontend/auth/login.php"] = 1465581389;$map["/var/www/html/webs2/platform/views/partials/login.php"] = 1465581389;$map["/var/www/html/webs2/platform/views/layout/frontend.php"] = 1465581389;$map["/var/www/html/webs2/platform/views/layout/main.layout.php"] = 1465581389;return $map;

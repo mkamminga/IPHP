@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
 	    
         <!--<link rel="stylesheet" href="/css/foundation.min.css" />-->
-        <link rel="stylesheet" href="/foundation/dist/assets/css/app.css" />
+        <link rel="stylesheet" href="/css/app.css" />
         <link rel="stylesheet" href="/css/main.css" />
         <link rel="stylesheet" href="/css/foundation-icons.css" />
         <script src="/js/vendor/modernizr.js"></script>
@@ -158,7 +158,7 @@ if (count($products) > 0):
         <p>
             <strong>&euro; <?php print(number_format($product->price, 2, ',', '.')); ?></strong> (incl. <?php print($product->vat->rate); ?>% btw)
         </p>
-        <button type="button" class="button tiny add-product-to-cart" data-id="<?php print($product->id); ?>">Voeg toe aan winkelwagen!</button>
+        <button type="button" class="button small add-product-to-cart" data-id="<?php print($product->id); ?>">Voeg toe aan winkelwagen!</button>
     </div>
 </div>
 <?php
@@ -195,9 +195,7 @@ endif;
 $url = $this->service('url');
 ?>
 <script src="/js/vendor/jquery.js"></script>
-<!--<script src="/js/foundation.min.js"></script>
-<script src="/js/foundation.topbar.js"></script>-->
-<script src="/foundation/dist/assets/js/app.js"></script>
+<script src="/js/foundation/app.js"></script>
 <script>
 $(document).foundation();
 

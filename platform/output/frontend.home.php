@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
 	    
         <!--<link rel="stylesheet" href="/css/foundation.min.css" />-->
-        <link rel="stylesheet" href="/foundation/dist/assets/css/app.css" />
+        <link rel="stylesheet" href="/css/app.css" />
         <link rel="stylesheet" href="/css/main.css" />
         <link rel="stylesheet" href="/css/foundation-icons.css" />
         <script src="/js/vendor/modernizr.js"></script>
@@ -143,9 +143,7 @@ $url = $this->service('url');
 $url = $this->service('url');
 ?>
 <script src="/js/vendor/jquery.js"></script>
-<!--<script src="/js/foundation.min.js"></script>
-<script src="/js/foundation.topbar.js"></script>-->
-<script src="/foundation/dist/assets/js/app.js"></script>
+<script src="/js/foundation/app.js"></script>
 <script>
 $(document).foundation();
 

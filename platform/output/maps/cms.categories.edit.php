@@ -1,1 +1,0 @@
-<?php $map=[];$map["/Applications/MAMP/htdocs/school webs/web2/platform/views/cms/categories/edit.php"] = 1465479449;$map["/Applications/MAMP/htdocs/school webs/web2/platform/views/cms/layout/backend.php"] = 1465492936;$map["/Applications/MAMP/htdocs/school webs/web2/platform/views/layout/main.layout.php"] = 1465391068;return $map;

@@ -19,7 +19,8 @@ class ProductsController extends Controller
         $product    = new Product;
         $category   = (new Category)->findOrFail($sub_category_id);
         if ($this->verifySubCategory($category_id, $category)){
-            $products   = $product->getCollection($product->fromCategory($sub_category_id));
+            $products   = $product->with('vat')
+                                    ->get($product->fromCategory($sub_category_id));
             
             return $this->view('frontend::products::overview.php', [
                 'category'  => $category,
@@ -58,7 +59,9 @@ class ProductsController extends Controller
             $searchable = $productModel->select();
         }
 
-        $products = $productModel->with('category')->get($searchable->orderBy('name'));
+        $products   = $productModel->with('category')
+                                    ->with('vat')
+                                    ->get($searchable->orderBy('name'));
 
         return $this->view('frontend::products::search.php', [
             'products' => $products

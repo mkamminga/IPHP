@@ -4,7 +4,8 @@
 	<title>Bestelgegevens</title>	
 	<meta charset="UTF-8">
 	    
-        <link rel="stylesheet" href="/css/foundation.min.css" />
+        <!--<link rel="stylesheet" href="/css/foundation.min.css" />-->
+        <link rel="stylesheet" href="/foundation/dist/assets/css/app.css" />
         <link rel="stylesheet" href="/css/main.css" />
         <link rel="stylesheet" href="/css/foundation-icons.css" />
         <script src="/js/vendor/modernizr.js"></script>
@@ -13,120 +14,102 @@
 <div id="main">
     <?php
     $messages = $this->service('htmlMessages');
-    $messages->errorClass('alert-box alert');
+    $messages->errorClass('callout alert');
     ?>
 	<?php if (!isset($menus) || $menus != $__view->getInjectedVar("menus")){$menus=$__view->getInjectedVar("menus");}if (!isset($breadcrumbs) || $breadcrumbs != $__view->getInjectedVar("breadcrumbs")){$breadcrumbs=$__view->getInjectedVar("breadcrumbs");}if (!isset($userGuard) || $userGuard != $__view->getInjectedVar("userGuard")){$userGuard=$__view->getInjectedVar("userGuard");}if (!isset($cartCount) || $cartCount != $__view->getInjectedVar("cartCount")){$cartCount=$__view->getInjectedVar("cartCount");} ?>
                 <?php
 $url = $this->service('url');
 ?>
-<div style="background-color: white">
-    <div class="large-2 small-6 columns">
-        <img src="/images/logo.png" style="width:100px;height:75px;">
-    </div>
+<div class="top">
     <div class="row">
-
         <div class="small-2 large-2 columns">
             <h1 style="color: #ffcc00">Goldenfingers</h1>
         </div>
         <div class="large-3 columns">
-            <a href="<?php print($url->route('CartOverview')); ?>">
                 <div class="panel callout radius">
-                    <h6 class="li-cart"><strong id="cart-count"><?php print($cartCount); ?></strong> producten in winkelwagen!</h6>
+                    <a href="<?php print($url->route('CartOverview')); ?>"><h6 class="li-cart"><span class="warning badge" id="cart-count"><?php print($cartCount); ?></span> producten in winkelwagen!</h6></a>
                 </div>
-            </a>
         </div>
     </div>
 
-    <nav class="top-bar" data-topbar role="navigation">
-        <ul class="title-area">
-            <li class="name">
-                <h1><a href="/">GoldenFingers</a></h1>
-            </li>
-        
-            <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
-        </ul>
+    <div class="top-bar">
+        <div class="top-bar-left">
+        <!-- Left Nav Section -->
+        <?php
+        $menu = $this->service('menu');
 
-        <section class="top-bar-section">
-            <!-- Left Nav Section -->
-            <?php
-            $displayMenu = function (array $items, $class = '') use($url, &$displayMenu) {
-                $output =   '<ul class="'. $class .'">' . chr(13) . chr(9);
-                foreach ($items as $menu):
-                    $params = isset($menu->params) ? $menu->params : [];
-                    $subMenu = isset($menu->subMenu) ? $menu->subMenu : [];
-                    $output.= chr(9) . chr(9) .  '<li'. (count($subMenu) > 0 ? ' class="has-dropdown"': '') .'>'. chr(13) . chr(9). chr(9) . chr(9).  chr(9) . '<a href="'. $url->route($menu->link, $params) .'">'. $menu->name .'</a>' . chr(13) . chr(9) . chr(9);
-                    
-                    if (count($subMenu) > 0) {
-                        $output.= chr(9) . chr(9) . $displayMenu($subMenu, 'dropdown') . chr(9);
-                    }
-                    
-                    $output.=  chr(9) . '</li>'.chr(13) . chr(9);
-                endforeach;
-                
-                $output.= chr(9) . '</ul>' . chr(13) . chr(9);
-                
-                return $output;
-        
-            };
-            
-            print($displayMenu($menus, 'left'));     
-            ?>
-            <!-- Right Nav Section -->
-            <ul class="right">
+        $menu->setMenuClass(['dropdown', 'menu']);
+        $menu->setMenuAttrs(['data-dropdown-menu']);
+        $menu->setSubMenuClass(['menu']);
+
+        print($menu->displayMenu($menus));
+        ?>
+        </div>
+        <div class="top-bar-right">
+            <form action="<?php print($url->route('ProductSearch')); ?>" method="get">
+                <!-- Right Nav Section -->
+                <ul class="menu">
+                    <?php
+                    if (!$userGuard->loggedIn()):
+                    ?>
+                        <li>
+                            <a href="/login">Log in</a>
+                        </li>
+                    <?php
+                    else:
+                    ?>
+                        <li>Welkom: <?php print($userGuard->getUsername()); ?></li> 
+                        <li><a href="/logout">Log out</a></li>
+                    <?php
+                    endif;
+                    ?>
+                    <li><input name="q" type="text" placeholder="Products"></li>
+                    <li><button type="submit" class="button expand search">Search</button></li>
+                </ul>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 large-centered columns">
+        <?php
+        //display breadcrumbs
+        if (isset($breadcrumbs) && !empty($breadcrumbs)):
+        ?>
+        <div class="clearfix">
+
+            <nav aria-label="You are here:" role="navigation" class="float-right">
+                <ul class="breadcrumbs">
                 <?php
-                if (!$userGuard->loggedIn()):
+                $num = count($breadcrumbs);
+                $i = 1;
+                foreach ((array)$breadcrumbs as $breadcrumb):
                 ?>
-                    <li>
-                        <a href="/login">Log in</a>
+                    <li<?php print($i == $num ? ' class="current"' : ''); ?>>
+                        <?php
+                        if ($i == $num):
+                        ?>
+                        <?php print($breadcrumb->getTitle()); ?>
+                        <?php
+                        else:
+                        ?>
+                        <a href="<?php print($breadcrumb->getUrl()); ?>"><?php print($breadcrumb->getTitle()); ?></a>
+                        <?php
+                        endif;
+                        ?>
                     </li>
                 <?php
-                else:
+                    $i++;
+                endforeach;
                 ?>
-                    <li><a href="#">Welkom: <?php print($userGuard->getUsername()); ?></a></li> 
-                    <li><a href="/logout">Log out</a></li>
-                <?php
-                endif;
-                ?>
-                <li class="has-form">
-                    <div class="row collapse div-search">
-                        <form action="<?php print($url->route('ProductSearch')); ?>" method="get">
-                            <div class="large-8 small-9 columns">
-                                <input name="q" type="text" placeholder="Products">
-                            </div>
-                            <div class="large-4 small-3 columns">
-                                <button type="submit" class="alert expand search">Search</button>
-                            </div>
-                        </form>
-                    </div>
-                </li>
-            </ul>
-        </section>
-    </nav>
-</div>
-
-<?php
-//display breadcrumbs
-if (isset($breadcrumbs) && !empty($breadcrumbs)):
-?>
-<div class="breadcrumb-frame clearfix">
-
-
-    <ul class="breadcrumbs right">
+                </ul>
+            </nav>
+        </div>
         <?php
-            $num = count($breadcrumbs);
-            $i = 1;
-            foreach ((array)$breadcrumbs as $breadcrumb):
+        endif;
         ?>
-            <li<?php print($i == $num ? ' class="current"' : ''); ?>><a href="<?php print($breadcrumb->getUrl()); ?>"><?php print($breadcrumb->getTitle()); ?></a></li>
-        <?php
-            $i++;
-        endforeach;
-        ?>
-    </ul>
-</div>
-<?php
-endif;
-?><?php if (!isset($errors) || $errors != $__view->getInjectedVar("errors")){$errors=$__view->getInjectedVar("errors");}if (!isset($order) || $order != $__view->getInjectedVar("order")){$order=$__view->getInjectedVar("order");}if (!isset($countries) || $countries != $__view->getInjectedVar("countries")){$countries=$__view->getInjectedVar("countries");} ?>
+        <?php if (!isset($errors) || $errors != $__view->getInjectedVar("errors")){$errors=$__view->getInjectedVar("errors");}if (!isset($order) || $order != $__view->getInjectedVar("order")){$order=$__view->getInjectedVar("order");}if (!isset($countries) || $countries != $__view->getInjectedVar("countries")){$countries=$__view->getInjectedVar("countries");} ?>
               <div class="row">
     <?php
     if (isset($errors)):
@@ -195,41 +178,36 @@ endif;
     </form>
 </div>
 
-<footer class="row">
-    <div class="large-12 columns"><hr/>
-        <div class="panel">
+        <footer>
+            <hr/>
+            <div class="panel">
+                <div class="row">
+                    <div class="large-2 small-6 columns">
+                        <img src="/images/cthulu.jpg">
+                    </div>
+
+                    <div class="large-10 small-6 columns">
+                        <strong>This Site Is Managed By</strong>
+                        Our overlord Cthulu
+                    </div>
+                </div>
+            </div>
             <div class="row">
-
-                <div class="large-2 small-6 columns">
-                    <img src="/images/cthulu.jpg">
+                <div class="large-6 columns">
+                    <p>&copy; Copyright Cthulu productions  </p>
                 </div>
-
-                <div class="large-10 small-6 columns">
-                    <strong>This Site Is Managed By</strong>
-
-                    Our overlord Cthulu
-                </div>
-
             </div>
-        </div>
-        <div class="row">
-
-
-            <div class="large-6 columns">
-                <p>&copy; Copyright Cthulu productions  </p>
-            </div>
-
-
-        </div>
+        </footer>
     </div>
-</footer>
+</div>
 </div>
 <?php
 $url = $this->service('url');
 ?>
 <script src="/js/vendor/jquery.js"></script>
-<script src="/js/foundation.min.js"></script>
-<script src="/js/foundation.topbar.js"></script>
+<!--<script src="/js/foundation.min.js"></script>
+<script src="/js/foundation.topbar.js"></script>-->
+<script src="/foundation/dist/assets/js/app.js"></script>
 <script>
 $(document).foundation();
 

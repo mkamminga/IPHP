@@ -24,7 +24,8 @@ class Request {
 		}
 		
 		if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
-			$this->currentUrl = str_replace('?' . $_SERVER['QUERY_STRING'], '', $this->currentUrl);
+			$query = urldecode($_SERVER['QUERY_STRING']);
+			$this->currentUrl = str_replace('?' . $query, '', $this->currentUrl);
 		}
 
 		$currentUrlLength = strlen($this->currentUrl);

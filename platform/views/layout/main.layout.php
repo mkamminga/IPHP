@@ -4,7 +4,8 @@
 	<title><< show('title', 'Defaults')</title>	
 	<meta charset="UTF-8">
 	>> section('styles')
-        <link rel="stylesheet" href="/css/foundation.min.css" />
+        <!--<link rel="stylesheet" href="/css/foundation.min.css" />-->
+        <link rel="stylesheet" href="/foundation/dist/assets/css/app.css" />
         <link rel="stylesheet" href="/css/main.css" />
         <link rel="stylesheet" href="/css/foundation-icons.css" />
     << section('styles')
@@ -16,7 +17,8 @@
 <div id="main">
     <?php
     $messages = $this->service('htmlMessages');
-    $messages->errorClass('alert-box alert');
+    $messages->errorClass('callout alert');
+    $messages->warningClass('callout warning');
     ?>
 	<< show('content', '')
 </div>

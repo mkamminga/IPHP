@@ -9,5 +9,6 @@ return [
 	'input' => \IPHP\Helpers\Input::class,
 	//View helpers
 	'htmlMessages' => \IPHP\Helpers\View\Messages::class,
-	'form' => \IPHP\Helpers\View\Form::class
+	'form' => \IPHP\Helpers\View\Form::class,
+	'menu' => \IPHP\Helpers\View\Menu::class,
 ];

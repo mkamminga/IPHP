@@ -8,6 +8,7 @@ use IPHP\Model\HasOne;
 class Order extends Model {
     protected $table = 'orders';
     protected $primaryKeys = ['id'];
+    protected $softDelete = true;
 
     public function all() {
         return $this->select('orders.*', '(SELECT SUM(orderrows.quantity * orderrows.price) FROM orderrows WHERE orderrows.Orders_id = orders.id) AS total');

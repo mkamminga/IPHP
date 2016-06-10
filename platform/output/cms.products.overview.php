@@ -36,10 +36,9 @@
                     <ul class="side-nav">
                         <li><a href="<?php print($url->route('Dashboard')); ?>">Dashboard</a></li>
                         <li><a href="<?php print($url->route('NavigationOverview')); ?>">Navigatie</a></li>
-                        <li><a href="{{ URL::route('beheer.orders.index') }}">Orders</a></li>
-                        <li><a href="<?php print($url->route('ProductsOverview')); ?>">Products</a></li>
-                        <li><a href="<?php print($url->route('CategoriesOverview')); ?>">Categories</a></li>
-                        <li><a href="{{ URL::route('beheer.users.index') }}">Gebruikers</a></li>
+                        <li><a href="<?php print($url->route('OrdersOverview')); ?>">Orders</a></li>
+                        <li><a href="<?php print($url->route('ProductsOverview')); ?>">Producten</a></li>
+                        <li><a href="<?php print($url->route('CategoriesOverview')); ?>">Categorieën</a></li>
                     </ul>
                 </div> 
             </div>

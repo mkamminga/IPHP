@@ -4,7 +4,8 @@
 	<title>Orders</title>	
 	<meta charset="UTF-8">
 	    
-        <link rel="stylesheet" href="/css/foundation.min.css" />
+        <!--<link rel="stylesheet" href="/css/foundation.min.css" />-->
+        <link rel="stylesheet" href="/foundation/dist/assets/css/app.css" />
         <link rel="stylesheet" href="/css/main.css" />
         <link rel="stylesheet" href="/css/foundation-icons.css" />
         <script src="/js/vendor/modernizr.js"></script>
@@ -37,9 +38,8 @@
                         <li><a href="<?php print($url->route('Dashboard')); ?>">Dashboard</a></li>
                         <li><a href="<?php print($url->route('NavigationOverview')); ?>">Navigatie</a></li>
                         <li><a href="<?php print($url->route('OrdersOverview')); ?>">Orders</a></li>
-                        <li><a href="<?php print($url->route('ProductsOverview')); ?>">Products</a></li>
-                        <li><a href="<?php print($url->route('CategoriesOverview')); ?>">Categories</a></li>
-                        <li><a href="{{ URL::route('beheer.users.index') }}">Gebruikers</a></li>
+                        <li><a href="<?php print($url->route('ProductsOverview')); ?>">Producten</a></li>
+                        <li><a href="<?php print($url->route('CategoriesOverview')); ?>">Categorieën</a></li>
                     </ul>
                 </div> 
             </div>
@@ -50,6 +50,8 @@
                     <?php if (!isset($orders) || $orders != $__view->getInjectedVar("orders")){$orders=$__view->getInjectedVar("orders");} ?>
 		<?php
 	$orders = (array)$orders;
+
+	$translator = $this->service('translator');
 	if (count($orders) > 0):
 	?>
 		<table>
@@ -80,7 +82,7 @@
 						<td>&euro; <?php print(number_format($order->total, 2, ',', '.')); ?></td>
 						<td><?php print($order->created_at); ?></td>
 						<td><?php print($order->user->username); ?></td>
-						<td><?php print($order->status); ?></td>
+						<td><?php print($translator->get('orderstates', $order->status)); ?></td>
 					</tr>
 				<?php
 				endforeach;

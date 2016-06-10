@@ -3,28 +3,22 @@
 >> section('title', 'Winkelmandje')
 >> section('fcontent')
     >> uses shoppingcart
+<?php
+$url = $this->service('url');
+?>
+<div id="cart-frame">
+    >> partial('partials::shoppingcart.php')
+</div>    
+
+<div class="checkout">
     <?php
-    $url = $this->service('url');
+    if (count($shoppingcart) > 0):
     ?>
-    <div class="row">
-        <div class="large-12 columns">
-            <div class="row">
-                <div id="cart-frame">
-                    >> partial('partials::shoppingcart.php')
-                </div>    
-                
-                <div class="checkout">
-                    <?php
-                    if (count($shoppingcart) > 0):
-                    ?>
-                        <a href="<?php print($url->route('CheckoutShow')); ?>" class="button bt-checkout">Check out</a>
-                    <?php
-                    endif;
-                    ?>
-                </div>
-            </div>
-        </div>
-    </div>
+        <a href="<?php print($url->route('CheckoutShow')); ?>" class="button bt-checkout">Check out</a>
+    <?php
+    endif;
+    ?>
+</div>
 << section('fcontent')
 
 >> section('scripts')

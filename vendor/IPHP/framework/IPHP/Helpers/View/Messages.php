@@ -38,6 +38,6 @@ class Messages {
 	}
 
 	public function warning ($title, $message):string {
-		return "";
+		return '<div class="'. $this->waringClass .'"><h4>'. $title .'</h4><p>'. $message .'</p></div>';
 	}
 }

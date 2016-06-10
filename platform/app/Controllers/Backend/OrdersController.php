@@ -54,9 +54,9 @@ class OrdersController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function update($id, Request $request, Validator $validator)
+    public function put($id, Request $request, Validator $validator)
     {
-        $order = $orderModel->with('row')
+        $order = (new Order)->with('row')
                             ->with('user')
                             ->with('country')
                             ->findOrFail($id);
@@ -73,7 +73,7 @@ class OrdersController extends Controller
         if ($validator->validate($requestData)) {
             
             $order->set('city', $requestData['city']->getValue());
-            $order->set('address', $requestData['adres']->getValue());
+            $order->set('address', $requestData['address']->getValue());
             $order->set('zip', $requestData['zip']->getValue());
             $order->set('status', $requestData['status']->getValue());
 
@@ -90,20 +90,33 @@ class OrdersController extends Controller
             'errors' => $validator->getErrors()
         ]);
     }
-
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id)
+    public function showDelete($id)
     {
-        if (($order = Order::find($id))) {
-            $order->delete();
+        $order = (new Order)->with('user')->findOrFail($id);
+        $orderData = $order->contents();
+        return $this->view('cms::default.delete.php', [
+            'name' => 'Bestelling: #'. $orderData->id . ' geplaatst op "'. $orderData->created_at .'" door '. $orderData->user->username
+        ]);
+    }
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function delete($id)
+    {
+        if (!(new Order)->findOrFail($id)->softDelete()){
+            throw new \Exception("Kon order niet verwijderen!");
         }
 
-        return redirect()->route('beheer.orders.index');
+        return $this->redirect()->toRoute('OrdersOverview');
     }
     /**
      *

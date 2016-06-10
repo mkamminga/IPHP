@@ -37,9 +37,8 @@
                         <li><a href="<?php print($url->route('Dashboard')); ?>">Dashboard</a></li>
                         <li><a href="<?php print($url->route('NavigationOverview')); ?>">Navigatie</a></li>
                         <li><a href="<?php print($url->route('OrdersOverview')); ?>">Orders</a></li>
-                        <li><a href="<?php print($url->route('ProductsOverview')); ?>">Products</a></li>
-                        <li><a href="<?php print($url->route('CategoriesOverview')); ?>">Categories</a></li>
-                        <li><a href="{{ URL::route('beheer.users.index') }}">Gebruikers</a></li>
+                        <li><a href="<?php print($url->route('ProductsOverview')); ?>">Producten</a></li>
+                        <li><a href="<?php print($url->route('CategoriesOverview')); ?>">Categorieën</a></li>
                     </ul>
                 </div> 
             </div>
@@ -48,12 +47,12 @@
                 <h2> Categorie bewerken</h2>
                 <div class="content">
                     <?php if (!isset($parents) || $parents != $__view->getInjectedVar("parents")){$parents=$__view->getInjectedVar("parents");}if (!isset($category) || $category != $__view->getInjectedVar("category")){$category=$__view->getInjectedVar("category");}if (!isset($errors) || $errors != $__view->getInjectedVar("errors")){$errors=$__view->getInjectedVar("errors");} ?>
-			    <?php
-    if (isset($errors)):
-    	print($this->service('htmlMessages')->errors($errors));
-    endif;
+				<?php
+	if (isset($errors)):
+		print($this->service('htmlMessages')->errors($errors));
+	endif;
 
-    $form = $this->service('form');
+	$form = $this->service('form');
 	$input = $this->service('input');
 	$input->setModel($category);
 	?>

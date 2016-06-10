@@ -127,7 +127,7 @@ $url = $this->service('url');
 $url = $this->service('url');
 ?>
 <script src="/js/vendor/jquery.js"></script>
-<script src="/js/app.js"></script>
+<script src="/js/foundation/app.js"></script>
 <script>
 $(document).foundation();
 

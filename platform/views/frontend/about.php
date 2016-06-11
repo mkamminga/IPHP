@@ -1,6 +1,6 @@
 >> parent('layout::frontend.php')
 
->> section('title', 'login')
+>> section('title', 'About')
 >> section('fcontent')
 <h1>About</h1>
 

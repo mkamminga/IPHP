@@ -3,23 +3,24 @@
 >> section('content')
     >> uses userGuard
     <div class="container row">        
-        <div class="row">
-            <div class="large-12 columns">
-                <div class="panel">
-                    <h1>CMS</h1>
-                    <span class="text-aligned-right">Welkom <?php print($userGuard->getUsername()); ?></span>
-                </div>
+        <div class="row black">
+            <div class="small-4 large-6 columns">
+                <h1 style="color: #ffcc00">Goldenfingers</h1>
+            </div>
+            <div class="small-2 large-2 columns">
+                <span class="text-aligned-right secondary label">Welkom <?php print($userGuard->getUsername()); ?></span>
             </div>
         </div>
-        
+        <hr />
         <div class="row">
             <div class="large-3 columns">
-                <div class="panel">
+                <div class="callout">
                     <h3>Menu</h3>
+                    <hr />
                     <?php
                     $url = $this->service('url');
                     ?>
-                    <ul class="side-nav">
+                    <ul class="menu vertical">
                         <li><a href="<?php print($url->route('Dashboard')); ?>">Dashboard</a></li>
                         <li><a href="<?php print($url->route('NavigationOverview')); ?>">Navigatie</a></li>
                         <li><a href="<?php print($url->route('OrdersOverview')); ?>">Orders</a></li>

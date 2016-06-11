@@ -22,6 +22,6 @@ $input = $this->service('input');
     </div>
 
     <div class="large-3 rows">
-        <button type="submit">Login</button>
+        <button type="submit" class="button">Login</button>
     </div>
 </form>

@@ -78,7 +78,7 @@
             </div>
 
             <div class="large-3 rows">
-                <button type="submit" class="button">Login</button>
+                <button type="submit" class="button">Registreer</button>
             </div>
         </form>
     </div>

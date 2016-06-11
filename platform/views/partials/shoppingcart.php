@@ -1,7 +1,8 @@
 >> uses shoppingcart
 <h2 class="h2-state">Cart</h2>
 <?php
-if (count($shoppingcart) > 0):
+$items = $shoppingcart->getItems();
+if (count($items) > 0):
 ?>
 <form method="post" action="" onsubmit="return false">
     <table class="t-shoppingcart">
@@ -18,7 +19,7 @@ if (count($shoppingcart) > 0):
 
         <tbody class="tb-cart">
         <?php
-        $items = $shoppingcart->getItems();
+        
         foreach($items as $item):
             $product = $item->getProduct()->contents();
         ?>
@@ -60,5 +61,7 @@ if (count($shoppingcart) > 0):
     </table>
 </form>
 <?php
+else:
+    print($this->service('htmlMessages')->warning('Geen producten', 'Geen producten toegevoegd aan uw winkelmand!'));
 endif;
 ?>

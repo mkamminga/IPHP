@@ -75,7 +75,7 @@ class ShoppingCartController extends Controller
         } else {
 
             $cart->removeItem($cartItem);
-            $guard->save();
+            $guard->save($guard->getKey());
 
             return $this->json([
                 'status' => 'success',

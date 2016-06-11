@@ -89,7 +89,7 @@ class OrdersController extends Controller
         $validator->addRules([
             new Rule('firstname', 'Voornaam', ['required', 'min:size=2', 'max:size=20']),
             new Rule('lastname', 'Achternaam', ['required', 'min:size=2', 'max:size=40']),
-            new Rule('country_id', 'Land', ['required']),
+            new Rule('country_id', 'Land', ['required', 'num']),
             new Rule('city', 'Woonplaats', ['required', 'min:size=2', 'max:size=70']),
             new Rule('address', 'Adres', ['required', 'min:size=4', 'max:size=120']),
             new Rule('zip', 'Postcode', ['required', 'min:size=4', 'max:size=120']),
@@ -99,15 +99,17 @@ class OrdersController extends Controller
 
         $all = $request->all();
 
+        $input = $this->sm->getService('input');
+
         if ($validator->validate($all)){
-            $order->set('firstname', $all['firstname']->getValue());
-            $order->set('lastname', $all['lastname']->getValue());
+            $order->set('firstname', $input->encode($all['firstname']->getValue()));
+            $order->set('lastname', $input->encode($all['lastname']->getValue()));
             $order->set('country_id', $all['country_id']->getValue());
-            $order->set('city', $all['city']->getValue());
-            $order->set('address', $all['address']->getValue());
-            $order->set('zip', $all['zip']->getValue());
+            $order->set('city', $input->encode($all['city']->getValue()));
+            $order->set('address', $input->encode($all['address']->getValue()));
+            $order->set('zip', $input->encode($all['zip']->getValue()));
             $order->set('email', $all['email']->getValue());
-            $order->set('telephone', $all['telephone']->getValue());
+            $order->set('telephone', $input->encode($all['telephone']->getValue()));
             if ($user) {
                 $order->set('Users_id', $user->retreive('id'));
             }

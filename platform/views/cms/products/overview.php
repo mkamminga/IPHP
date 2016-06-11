@@ -9,21 +9,6 @@
 	$form 	= $this->service('form');
 	$input 	= $this->service('input');
 	?>
-	<form action="" method="get">
-		<div class="row">
-			<div class="large-12 columns">
-				<div class="row collapse">
-					<div class="small-10 columns">
-					<?php print($form->text('artikelnr', $input->escaped('artikelnr'), ['placeholder' => 'Article number'])); ?>
-					</div>
-
-					<div class="small-2 columns">
-						<button type="submit" class="button postfix">Zoek</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</form>
 	<a href="<?php print($url->route('ProductsShowAdd')) ?>" class="button success">Nieuw product</a>
 	<?php
 	$products = (array)$products;

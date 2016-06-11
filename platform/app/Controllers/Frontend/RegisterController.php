@@ -4,6 +4,7 @@ namespace App\Controllers\Frontend;
 use IPHP\Validation\Validator;
 use IPHP\Validation\Rule;
 use IPHP\Http\Request;
+use IPHP\Helpers\Input;
 
 use App\Controllers\Controller;
 use App\User;
@@ -18,7 +19,7 @@ class RegisterController extends Controller{
 		]);
 	}
 
-	public function postRegister (Request $request, Validator $validator) {
+	public function postRegister (Request $request, Validator $validator, Input $input) {
 		$userModel = new \App\User;
 
 		$validator->addRules([
@@ -27,7 +28,7 @@ class RegisterController extends Controller{
 			new Rule('password_confirmation', 'Herhaal wachtwoord', ['required']),
 			new Rule('firstname', 'Voornaam', ['required', 'min:size=2', 'max:size=20']),
             new Rule('lastname', 'Achternaam', ['required', 'min:size=2', 'max:size=40']),
-            new Rule('country_id', 'Land', ['required']),
+            new Rule('country_id', 'Land', ['required', 'num']),
             new Rule('city', 'Woonplaats', ['required', 'min:size=2', 'max:size=70']),
             new Rule('address', 'Adres', ['required', 'min:size=4', 'max:size=120']),
             new Rule('zip', 'Postcode', ['required', 'min:size=4', 'max:size=120']),
@@ -55,13 +56,13 @@ class RegisterController extends Controller{
 			if ($group){
 				$userModel->set('username', $all['username']->getValue());
 				$userModel->set('password', password_hash($all['password']->getValue(), PASSWORD_BCRYPT, ['cost' => 10]));
-				$userModel->set('firstname', $all['firstname']->getValue());
-				$userModel->set('lastname', $all['lastname']->getValue());
+				$userModel->set('firstname', $input->encode($all['firstname']->getValue()));
+				$userModel->set('lastname', $input->encode($all['lastname']->getValue()));
 				$userModel->set('country_id', $all['country_id']->getValue());
-				$userModel->set('city', $all['city']->getValue());
-				$userModel->set('address', $all['address']->getValue());
-				$userModel->set('zip', $all['zip']->getValue());
-				$userModel->set('email', $all['email']->getValue());
+				$userModel->set('city', $input->encode($all['city']->getValue()));
+				$userModel->set('address', $input->encode($all['address']->getValue()));
+				$userModel->set('zip', $input->encode($all['zip']->getValue()));
+				$userModel->set('email', $input->encode($all['email']->getValue()));
 				$userModel->set('active', 1);
 				$userModel->set('group_id', $group->retreive('id'));
 

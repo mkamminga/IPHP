@@ -62,11 +62,11 @@ return [
 				new Route('CheckoutStatus', '/geplaatst', 'get', App\Controllers\Frontend\OrdersController::class, 'showStatus')
 			]),
 			//About,
-			new Route('About', '/about', 'get', App\Controllers\Frontend\HomeController::class, 'index'),
+			new Route('About', '/about', 'get', App\Controllers\Frontend\HomeController::class, 'about'),
 			//Policy
-			new Route('Policy', '/policy', 'get', App\Controllers\Frontend\PolicyController::class, 'index'),
+			new Route('Policy', '/policy', 'get', App\Controllers\Frontend\HomeController::class, 'policy'),
 			//Contact
-			new Route('Contact', '/contact', 'get', App\Controllers\Frontend\ContactController::class, 'index'),
+			new Route('Contact', '/contact', 'get', App\Controllers\Frontend\HomeController::class, 'contact'),
 			//Login
 			new Route('LoginGet','/login', 'get', App\Controllers\Frontend\LoginController::class, 'showLogin'),
 			new Route('LoginPost','/login', 'post', App\Controllers\Frontend\LoginController::class, 'postLogin'),

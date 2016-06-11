@@ -60,5 +60,20 @@ return [
 		Breadcrumb::make('RegisterGet', [], function (Breadcrumb $breadcrumb, array $params) {
 			$breadcrumb->setTitle('Registreer');
 		})->addAlias('RegisterPost')
+	)->addChild(
+		//About
+		Breadcrumb::make('About', [], function (Breadcrumb $breadcrumb, array $params) {
+			$breadcrumb->setTitle('About');
+		})
+	)->addChild(
+		//Policy
+		Breadcrumb::make('Policy', [], function (Breadcrumb $breadcrumb, array $params) {
+			$breadcrumb->setTitle('Policy');
+		})
+	)->addChild(
+		//Contact
+		Breadcrumb::make('Contact', [], function (Breadcrumb $breadcrumb, array $params) {
+			$breadcrumb->setTitle('Neem contact op');
+		})
 	)
 ];

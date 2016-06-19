@@ -10,11 +10,16 @@ class View {
 	private $viewResponse;
 	private $compiler;
 	private $serviceManager;
+	private $allowedApps = [];
 
 	public function __construct (ViewResponse $viewResponse, Compiler $compiler, ServiceManager $serviceManager) {
 		$this->viewResponse = $viewResponse;
 		$this->compiler = $compiler;
 		$this->serviceManager = $serviceManager;
+
+		if ($serviceManager->hasConfig('providers')){
+			$this->allowedApps = array_keys($serviceManager->getConfig('providers')->data());
+		}
 	}	
 
 	public function getCompiledOutput() {
@@ -50,7 +55,11 @@ class View {
 	}
 
 	public function service ($name = '') {
-		return $this->serviceManager->getService($name);
+		if (in_array($name, $this->allowedApps)){
+			return $this->serviceManager->getService($name);
+		}
+
+		return NULL;
 	}
 
 	public function render () {

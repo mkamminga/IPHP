@@ -12,13 +12,15 @@ class Validator {
 	private $rules = [];
 	protected $requirementToMethodMap = [
 		'required' 		=> 'validateRequired',
+		'array'			=> 'validateArray',
 		'alpha_num' 	=> 'validateAlphaNum',
 		'num'			=> 'validateNum',
 		'email' 		=> 'validateEmail',
 		'min' 			=> 'validateMinSize',
 		'max' 			=> 'validateMaxSize',
 		'mime'			=> 'validateMimeType',
-		'regex'			=> 'validateRegex'
+		'regex'			=> 'validateRegex',
+		'date_time'		=> 'validateDateTime'
 	];
 
 	protected $nonEscapeable = [
@@ -40,6 +42,7 @@ class Validator {
 			$inputName 	= $rule->getInputname();
 			$methods 	= $rule->getRequirements();
 			$value 		= isset($data[$inputName]) ? $data[$inputName] : NULL;
+			
 			$valueSet 	= $value != NULL && !$value->isNull();
 			
 			foreach ($methods as $method) {
@@ -123,6 +126,10 @@ class Validator {
 	private function validateRequired ($data):bool {
 		return ($data && $data instanceof RequestInput && !$data->isEmpty());
 	}
+
+	private function validateArray(RequestInput $data):bool {
+		return $data->is('array');
+	}
 	
 	private function validateRegex (RequestInput $data, $params = []):bool {
 		if (!isset($params['expression'])) {
@@ -141,7 +148,7 @@ class Validator {
 	}
 
 	private function validateNum (RequestInput $data):bool {
-		return preg_match('/^[0-9]+$/', $data->getValue());
+		return preg_match('/^(\-)?[0-9\.\,]+$/', $data->getValue());
 	}
 
 	private function validateMinSize (RequestInput $input, array $bounds): bool{
@@ -193,4 +200,13 @@ class Validator {
 
 		return true;
 	}
+
+	private function validateDateTime (RequestInput $date):bool {
+		$value = $date->getValue();
+		if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}$/', $value)) {
+			return (strtotime($value) !== false);
+		}
+
+		return false;
+	}	
 }

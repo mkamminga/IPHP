@@ -7,9 +7,9 @@ abstract class Clauseable extends Queriable {
 	protected $where;
 	protected $having;
 
-	public function where (Where $clause) {
+	public function where (Where $clause) { 
 		$this->where = $clause;
-
+	
 		return $this;
 	}
 
@@ -17,6 +17,14 @@ abstract class Clauseable extends Queriable {
 		$this->having = $clause;
 
 		return $this;
+	}
+
+	public function getClause () {
+		if  (!$this->where){
+			$this->where = new Where;
+		}
+
+		return $this->where;
 	}
 
 	protected function appendClauseTo (Clause $clause, string &$appendQueryTo, array &$appendValuesTo = []) {

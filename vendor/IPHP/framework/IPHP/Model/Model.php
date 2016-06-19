@@ -6,6 +6,8 @@ use IPHP\Database\Updateable;
 use IPHP\Database\Insertable;
 use IPHP\Database\Delete;
 use IPHP\Database\Where;
+use IPHP\Database\Clause;
+use IPHP\Database\Clauseable;
 
 class Model {
 	private static $defaultConnection = null;
@@ -43,10 +45,6 @@ class Model {
 	 */
 	public function select(...$fields) {
 		$select = (new Selectable($this->table))->select($fields);
-		
-		if ($this->softDelete) {
-			$select->where((new Where)->isNull('`'. $this->table .'`.`deleted_at`'));
-		}
 
 		return $select;
 	}
@@ -83,10 +81,29 @@ class Model {
 			$i++;
 		}
 		
-		return $this->getOne((new Selectable($this->table))->where($where));
+		return $this->getOne($this->select()->where($where));
+	}
+
+	public function whereIs (Selectable $query, ...$ids) {
+		$clause = $query->getClause();
+		$i = 0;
+		foreach ($ids as $id) {
+			if (!isset($this->primaryKeys[$i])) {
+				return NULL;
+			}
+			$clause->equals($this->primaryKeys[$i], $id);
+
+			$i++;
+		}
+	
+		return $this->getOne($query);
 	}
 
 	private function farceGet (Selectable $select, $many = true) {
+		if ($this->softDelete) {
+			$select->getClause()->isNull('`'. $this->table .'`.`deleted_at`');
+		}
+
 		if ($many) {
 			$queryResult = $this->connection->fetchAll($select->getComputedQuery(), $select->getValues());	
 		} else {
@@ -272,11 +289,22 @@ class Model {
 
 		if (!empty($this->related)) {
 			foreach ($this->related as $key => $model) {
+
+				$contents = NULL;
+				if (is_array($model)) {
+					$contents = [];
+					foreach ($model as $modelItem) {
+						$contents[] = $modelItem->contents();
+					}
+				} else {
+					$contents = $model->contents();
+				}
+
 				if (!isset($data->{$key})) {
-					$data->{$key} = $model->contents();
+					$data->{$key} = $contents;
 				} else {
 					$newKey = 'related_' . $key; 
-					$data->{$newKey} = $model->contents();
+					$data->{$newKey} = $contents;
 				}
 			}
 		}

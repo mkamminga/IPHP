@@ -27,7 +27,7 @@ $url = $this->service('url');
 
         $menu->setMenuClass(['dropdown', 'menu']);
         $menu->setMenuAttrs(['data-dropdown-menu']);
-        $menu->setSubMenuClass(['menu']);
+        $menu->setSubMenuClass(['menu', 'vertical']);
 
         print($menu->displayMenu($menus));
         ?>
@@ -50,7 +50,7 @@ $url = $this->service('url');
                     <?php
                     endif;
                     ?>
-                    <li><input name="q" type="text" placeholder="Products"></li>
+                    <li><input name="q" type="text" placeholder="Products" required="required"></li>
                     <li><button type="submit" class="button expand search">Search</button></li>
                 </ul>
             </form>
@@ -127,21 +127,24 @@ $url = $this->service('url');
 $url = $this->service('url');
 ?>
 <script src="/js/vendor/jquery.js"></script>
-<script src="/js/foundation/app.js"></script>
+<script src="/js/vendor/what-input.js"></script>
+<script src="/js/vendor/foundation.min.js"></script>
+<script src="/js/vendor/modernizr.js"></script>
 <script>
 $(document).foundation();
-
-$(".add-product-to-cart").click(function () {
-    var url = '<?php print($url->route('CartItemPost')); ?>';
-    var params={"id" : $(this).data('id'), "quantity" : 1};
-    $.post(url, params, function (result) {
-        if (result) {
-            if (result.status == "success") {
-                updateCartCount(result.data.count);
+$(document).ready(function () {
+    $(".add-product-to-cart").click(function () {
+        var url = '<?php print($url->route('CartItemPost')); ?>';
+        var params={"id" : $(this).data('id'), "quantity" : 1};
+        $.post(url, params, function (result) {
+            if (result) {
+                if (result.status == "success") {
+                    updateCartCount(result.data.count);
+                }
             }
-        }
-    }, 'json');
-});
+        }, 'json');
+    });    
+})
 
 function updateCartCount (num) {
     console.log("Update to: "+ num);

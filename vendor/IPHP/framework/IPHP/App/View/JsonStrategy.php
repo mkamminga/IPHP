@@ -9,7 +9,7 @@ class JsonStrategy {
         
         $output = json_encode($vars);
         $httpResponse = $vr->getHttpResponse();
-        $httpResponse->addHeader('Content-type', 'application\json');
+        $httpResponse->addHeader('Content-Type', 'application/json');
         $httpResponse->setBody($output);
 		$httpResponse->send();
     }

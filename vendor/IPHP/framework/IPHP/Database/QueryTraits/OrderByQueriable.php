@@ -10,7 +10,7 @@ trait OrderByQueriable {
 	
 	public function orderBy (string $field, string $sortby = 'ASC') {
 		$sortby = strtoupper($sortby);
-		if ($sortby != 'ASC' || $sortby != 'DESC') {
+		if ($sortby != 'ASC' && $sortby != 'DESC') {
 			$sortby = 'ASC';
 		}
 

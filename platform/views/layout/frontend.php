@@ -134,12 +134,26 @@ $url = $this->service('url');
 $(document).foundation();
 $(document).ready(function () {
     $(".add-product-to-cart").click(function () {
+        var frame = $(this);
         var url = '<?php print($url->route('CartItemPost')); ?>';
         var params={"id" : $(this).data('id'), "quantity" : 1};
         $.post(url, params, function (result) {
             if (result) {
                 if (result.status == "success") {
                     updateCartCount(result.data.count);
+                    var offset = frame.offset();
+                    
+                    var success = "<div class=\"product-callout-frame\" style=\"position: absolute; top: "+ (offset.top / 5) +"px; left: "+ offset.left +" px; z-index: 1000;\">"+
+                                    "<div data-alert class=\"callout success\">Product is aan winkelmandje toegevoegd!</div>"+
+                                "</div>";
+
+                    console.log(success);
+                    var btn = $(success);
+                    
+                    btn.insertAfter(frame);
+                    btn.fadeOut(1000, function () {
+                        $(this).remove();
+                    });
                 }
             }
         }, 'json');

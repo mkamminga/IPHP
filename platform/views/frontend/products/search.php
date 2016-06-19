@@ -14,7 +14,7 @@ $input = $this->service('input');
     <form action="" method="get">
         <div class='large-6 rows'>
             <label>Zoek op: 
-                <?php print($form->text('q', $input->escaped('q'))); ?>
+                <?php print($form->text('q', $input->escaped('q'), ['required' => 'required'])); ?>
             </label>
         </div>
 

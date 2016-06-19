@@ -38,7 +38,7 @@
 						<td><?php print($id); ?></td>
 						<td>&euro; <?php print(number_format($order->total, 2, ',', '.')); ?></td>
 						<td><?php print($order->created_at); ?></td>
-						<td><?php print($order->user->username); ?></td>
+						<td><?php print((isset($order->user) ? $order->user->username : '-')); ?></td>
 						<td><?php print($translator->get('orderstates', $order->status)); ?></td>
 					</tr>
 				<?php

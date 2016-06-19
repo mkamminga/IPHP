@@ -17,20 +17,20 @@ return [
 				$category = new App\Category;
 				$category = $category->find($params['category_id']);
 
-				$breadcrumb->setTitle('Category : '. $category->retreive('name'));
+				$breadcrumb->setTitle('Category : '. ($category ? $category->retreive('name') : 'Onbekend'));
 			})->addChild(
 				Breadcrumb::make('CategoryProducts', ['category_id', 'sub_category_id'], function (Breadcrumb $breadcrumb, array $params) {
 					//Set the title of the current subcategory
 					$category = new App\Category;
 					$category = $category->find($params['sub_category_id']);
 
-					$breadcrumb->setTitle('SubCategory : '. $category->retreive('name'));
+					$breadcrumb->setTitle('SubCategory : '. ($category ? $category->retreive('name') : 'Onbekend'));
 				})->addChild(
 					Breadcrumb::make('ProductItem', ['category_id', 'sub_category_id', 'product_id'], function (Breadcrumb $breadcrumb, array $params) {
 						//Set the title of the current product
 						$product = (new App\Product)->find($params['product_id']);
 
-						$breadcrumb->setTitle('Product : '. $product->retreive('name'));
+						$breadcrumb->setTitle('Product : '. ($product ? $product->retreive('name') : 'Onbekend'));
 					})
 				)
 			)

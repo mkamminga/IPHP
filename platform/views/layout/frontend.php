@@ -103,7 +103,7 @@ $url = $this->service('url');
             <div class="panel">
                 <div class="row">
                     <div class="large-2 small-6 columns">
-                        <img src="/images/cthulu.jpg">
+                        <img src="/images/cthulu.jpg" alt="Afgod">
                     </div>
 
                     <div class="large-10 small-6 columns">

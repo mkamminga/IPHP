@@ -11,5 +11,5 @@ return [
 	'htmlMessages' => \IPHP\Helpers\View\Messages::class,
 	'form' => \IPHP\Helpers\View\Form::class,
 	'menu' => \IPHP\Helpers\View\Menu::class,
-	'translator' => \IPHP\Translation\Translator
+	'translator' => \IPHP\Translation\Translator::class
 ];

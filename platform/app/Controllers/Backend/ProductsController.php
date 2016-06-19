@@ -255,7 +255,7 @@ class ProductsController extends Controller
             new Rule('Categories_id', 'Sub categorie', ['required']),
             new Rule('name', 'Naam', ['required', 'min:size=2', 'max:size=20']),
             new Rule('artikelnr', 'Artikel nummer', ['required', 'num']),
-            new Rule('price', 'Prijs', ['required', 'regex:expression=/^\d*(\.\d+|)?$/'], ['regex' => ':field is geen geldige prijs!']),
+            new Rule('price', 'Prijs', ['required', 'regex:expression=/^\d*(\.\d+)?$/'], ['regex' => ':field is geen geldige prijs!']),
             new Rule('vat_rate_id', 'Btw', ['required']),
             new Rule('short_description', 'Korte omschrijving', ['required', 'min:size=10', 'max:size=255']),
             new Rule('detail', 'Omschrijving', ['required', 'min:size=10', 'max:size=3000']),
